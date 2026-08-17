@@ -11,6 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;600&display=swap" rel="stylesheet" />
+<!-- OGL：WebGL 渲染库（波纹扭曲效果用） -->
+<script src="https://cdn.jsdelivr.net/npm/ogl/dist/ogl.umd.js"></script>
 
 <style>
   :root {
@@ -108,10 +110,15 @@
 
   /* ---------- Hero ---------- */
   .hero {
-    position: relative; min-height: 100svh; display: flex; align-items: center;
+    position: relative; min-height: 100vh; min-height: 100svh; display: flex; align-items: center;
     padding: 160px 0 100px; overflow: hidden;
   }
-  #constellation { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .ripple { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .ripple canvas { position: absolute; inset: 0; display: block; }
+  .hero-overlay {
+    position: absolute; inset: 0; pointer-events: none; z-index: 1;
+    background: linear-gradient(180deg, rgba(0,0,0,.62), rgba(0,0,0,.28) 45%, rgba(0,0,0,.72));
+  }
   .hero .container { position: relative; z-index: 2; }
 
   .hero-label {
@@ -310,7 +317,8 @@
 
 <!-- ===================== HERO ===================== -->
 <div class="hero" id="hero">
-  <canvas id="constellation"></canvas>
+  <div class="ripple" id="ripple"></div>
+  <div class="hero-overlay"></div>
   <div class="container">
     <p class="hero-label" data-reveal="up">AI PRODUCT MANAGER <span class="iris">/</span> 个人主页</p>
     <h1 class="hero-title" id="heroTitle">冯新波</h1>
@@ -496,84 +504,265 @@
     title.appendChild(s);
   });
 
-  /* ============ 2. 粒子星座（鼠标联动） ============ */
-  var canvas = d.getElementById('constellation');
-  if (canvas && canvas.getContext) {
-    var ctx = canvas.getContext('2d');
-    var DPR = Math.min(window.devicePixelRatio || 1, 2);
-    var hero = canvas.parentElement;
-    var W = 0, H = 0, parts = [], mouse = { x: -9999, y: -9999 };
+  /* ============ 2. 波纹扭曲（WebGL 鼠标联动） ============ */
+  // 效果：灰度图片 + 鼠标划过产生的涟漪波纹 + 紫色染色 + 漩涡扭曲
+  var rippleEl = d.getElementById('ripple');
+  var HERO_IMG = 'https://images.unsplash.com/photo-1782977389500-dd7adad33ebe?q=80&w=2000&auto=format&fit=crop'; // ← 想换图，改这里的网址
+  if (rippleEl && window.ogl) {
+    try {
+      var MAX_WAVES = 100;
+      var QUALITY_SCALE = { low: 0.4, medium: 0.7, high: 1 };
+      var START_SCALE = 1.5;
+      var LIFE_CONSTANT = Math.log(500);
 
-    function resize() {
-      W = hero.clientWidth; H = hero.clientHeight;
-      canvas.width = W * DPR; canvas.height = H * DPR;
-      canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
-      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    }
-    var COUNT = Math.min(110, Math.floor(W * H / 14000));
-    function seed() {
-      parts = [];
-      for (var i = 0; i < COUNT; i++) {
-        parts.push({
-          x: Math.random() * W, y: Math.random() * H,
-          vx: (Math.random() - .5) * .22, vy: (Math.random() - .5) * .22,
-          r: Math.random() * 1.5 + .4,
-          c: Math.random() < .12 ? '#ffb829' : (Math.random() < .3 ? '#8052ff' : '#ffffff'),
-          tw: Math.random() * Math.PI * 2, ts: .006 + Math.random() * .02
-        });
+      var waveVertex = `
+precision highp float;
+attribute vec2 position;
+attribute vec2 uv;
+attribute vec2 iOffset;
+attribute vec2 iScale;
+attribute float iOpacity;
+varying vec2 vUv;
+varying float vOpacity;
+void main() {
+  vUv = uv;
+  vOpacity = iOpacity;
+  gl_Position = vec4(iOffset + position * iScale, 0.0, 1.0);
+}`;
+
+      var waveFragment = `
+precision highp float;
+varying vec2 vUv;
+varying float vOpacity;
+uniform float uRings;
+const float PI = 3.141592653589793;
+const float EDGE = 0.006737947;
+void main() {
+  vec2 p = vUv * 2.0 - 1.0;
+  float r = dot(p, p);
+  if (r > 1.0) discard;
+  float brush = (exp(-r * 5.0) - EDGE) / (1.0 - EDGE);
+  brush *= 0.55 + 0.45 * cos(sqrt(r) * PI * 2.0 * uRings);
+  gl_FragColor = vec4(vec3(brush * vOpacity * vOpacity), 1.0);
+}`;
+
+      var screenVertex = `
+precision highp float;
+attribute vec2 position;
+attribute vec2 uv;
+varying vec2 vUv;
+void main() {
+  vUv = uv;
+  gl_Position = vec4(position, 0.0, 1.0);
+}`;
+
+      var compositeFragment = `
+precision highp float;
+varying vec2 vUv;
+uniform sampler2D uTexture;
+uniform sampler2D uDisplacement;
+uniform vec2 uResolution;
+uniform vec2 uTextureSize;
+uniform vec2 uTexel;
+uniform vec3 uTint;
+uniform vec3 uHighlight;
+uniform float uStrength;
+uniform float uSwirl;
+uniform float uDispersion;
+uniform float uGlint;
+uniform float uTintAmount;
+uniform float uGrayscale;
+const float TAU = 6.283185307179586;
+vec2 coverUV(vec2 uv) {
+  vec2 safe = max(uTextureSize, vec2(1.0));
+  vec2 s = uResolution / safe;
+  vec2 scaledSize = safe * max(s.x, s.y);
+  vec2 offset = (uResolution - scaledSize) * 0.5;
+  return (uv * uResolution - offset) / scaledSize;
+}
+void main() {
+  float amount = texture2D(uDisplacement, vUv).r;
+  vec2 base = coverUV(vUv);
+  float theta = amount * uSwirl * TAU;
+  vec2 dir = vec2(sin(theta), cos(theta));
+  vec2 push = dir * amount * uStrength;
+  vec3 color;
+  if (uDispersion > 0.001) {
+    float split = uDispersion * 0.25;
+    color.r = texture2D(uTexture, base + push * (1.0 + split)).r;
+    color.g = texture2D(uTexture, base + push).g;
+    color.b = texture2D(uTexture, base + push * (1.0 - split)).b;
+  } else {
+    color = texture2D(uTexture, base + push).rgb;
+  }
+  if (uGrayscale > 0.001) {
+    color = mix(color, vec3(dot(color, vec3(0.2126, 0.7152, 0.0722))), uGrayscale);
+  }
+  if (uTintAmount > 0.001) {
+    color = mix(color, color * uTint * 1.9, clamp(amount * 1.6, 0.0, 1.0) * uTintAmount);
+  }
+  if (uGlint > 0.001) {
+    float ex = texture2D(uDisplacement, vUv + vec2(uTexel.x, 0.0)).r - texture2D(uDisplacement, vUv - vec2(uTexel.x, 0.0)).r;
+    float ey = texture2D(uDisplacement, vUv + vec2(0.0, uTexel.y)).r - texture2D(uDisplacement, vUv - vec2(0.0, uTexel.y)).r;
+    vec3 normal = normalize(vec3(-ex * 26.0, -ey * 26.0, 1.0));
+    vec3 light = normalize(vec3(-0.35, 0.55, 1.0));
+    float raw = pow(max(dot(normal, light), 0.0), 22.0);
+    float flatSpec = pow(max(light.z, 0.0), 22.0);
+    color += uHighlight * clamp((raw - flatSpec) / max(1.0 - flatSpec, 0.0001), 0.0, 1.0) * uGlint;
+  }
+  gl_FragColor = vec4(color, 1.0);
+}`;
+
+      function hexRGB(hex) {
+        var c = hex.replace('#', '');
+        if (c.length === 3) c = c.split('').map(function (x) { return x + x; }).join('');
+        var n = parseInt(c, 16);
+        if (isNaN(n)) return [1, 1, 1];
+        return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
       }
-    }
-    var LINK = 130;
-    function frame() {
-      ctx.clearRect(0, 0, W, H);
-      var i, j, p, q, dx, dy, d;
-      for (i = 0; i < parts.length; i++) {
-        p = parts[i];
-        p.x += p.vx; p.y += p.vy;
-        if (p.x < -10) p.x = W + 10; else if (p.x > W + 10) p.x = -10;
-        if (p.y < -10) p.y = H + 10; else if (p.y > H + 10) p.y = -10;
-        p.tw += p.ts;
+
+      var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      var renderer = new ogl.Renderer({ alpha: false, antialias: false, dpr: Math.min(window.devicePixelRatio || 1, 2) });
+      var gl = renderer.gl;
+      gl.clearColor(0, 0, 0, 1);
+      var canvas = gl.canvas;
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
+      canvas.style.display = 'block';
+      rippleEl.appendChild(canvas);
+
+      var imageTexture = new ogl.Texture(gl, { generateMipmaps: false, minFilter: gl.LINEAR, magFilter: gl.LINEAR, wrapS: gl.CLAMP_TO_EDGE, wrapT: gl.CLAMP_TO_EDGE });
+
+      var compositeUniforms = {
+        uTexture: { value: imageTexture },
+        uDisplacement: { value: null },
+        uResolution: { value: [1, 1] },
+        uTextureSize: { value: [1, 1] },
+        uTexel: { value: [1, 1] },
+        uTint: { value: hexRGB('#a855f7') },
+        uHighlight: { value: [1, 1, 1] },
+        uStrength: { value: 0.2 },
+        uSwirl: { value: 1 },
+        uDispersion: { value: 0 },
+        uGlint: { value: 0 },
+        uTintAmount: { value: 0.08 },
+        uGrayscale: { value: 1 }
+      };
+
+      var img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.decoding = 'async';
+      img.onload = function () {
+        imageTexture.image = img;
+        compositeUniforms.uTextureSize.value = [img.naturalWidth || 1, img.naturalHeight || 1];
+      };
+      img.src = HERO_IMG;
+
+      var offsets = new Float32Array(MAX_WAVES * 2);
+      var scales = new Float32Array(MAX_WAVES * 2);
+      var opacities = new Float32Array(MAX_WAVES);
+
+      var waves = [];
+      for (var wi = 0; wi < MAX_WAVES; wi++) {
+        waves.push({ x: 0, y: 0, scale: START_SCALE, target: START_SCALE, size: 1, opacity: 0 });
       }
-      // 连线
-      for (i = 0; i < parts.length; i++) {
-        p = parts[i];
-        for (j = i + 1; j < parts.length; j++) {
-          q = parts[j];
-          dx = p.x - q.x; dy = p.y - q.y;
-          d = dx * dx + dy * dy;
-          if (d < LINK * LINK) {
-            ctx.strokeStyle = 'rgba(128,82,255,' + (0.16 * (1 - Math.sqrt(d) / LINK)) + ')';
-            ctx.lineWidth = 1;
-            ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
-          }
+      var current = 0;
+
+      var geometry = new ogl.Geometry(gl, {
+        position: { size: 2, data: new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]) },
+        uv: { size: 2, data: new Float32Array([0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1]) },
+        iOffset: { instanced: 1, size: 2, data: offsets },
+        iScale: { instanced: 1, size: 2, data: scales },
+        iOpacity: { instanced: 1, size: 1, data: opacities }
+      });
+
+      var waveUniforms = { uRings: { value: 4 } };
+      var waveProgram = new ogl.Program(gl, { vertex: waveVertex, fragment: waveFragment, uniforms: waveUniforms, transparent: true, depthTest: false, depthWrite: false, cullFace: false });
+      waveProgram.setBlendFunc(gl.ONE, gl.ONE);
+      var waveMesh = new ogl.Mesh(gl, { geometry: geometry, program: waveProgram, frustumCulled: false });
+
+      var DISP = 512;   // 位移场分辨率（固定，无需随画布缩放）
+      var displacementTarget = new ogl.RenderTarget(gl, { width: DISP, height: DISP, depth: false, minFilter: gl.LINEAR, magFilter: gl.LINEAR, wrapS: gl.CLAMP_TO_EDGE, wrapT: gl.CLAMP_TO_EDGE });
+      compositeUniforms.uDisplacement.value = displacementTarget.texture;
+      compositeUniforms.uTexel.value = [1 / DISP, 1 / DISP];
+
+      var compositeMesh = new ogl.Mesh(gl, {
+        geometry: new ogl.Triangle(gl),
+        program: new ogl.Program(gl, { vertex: screenVertex, fragment: compositeFragment, uniforms: compositeUniforms, depthTest: false, depthWrite: false })
+      });
+
+      var width = 1, height = 1;
+      function resize() {
+        width = Math.max(1, rippleEl.clientWidth);
+        height = Math.max(1, rippleEl.clientHeight);
+        renderer.setSize(width, height);
+        compositeUniforms.uResolution.value = [width, height];
+      }
+      var ro = new ResizeObserver(resize);
+      ro.observe(rippleEl);
+      resize();
+
+      function setWave(x, y, power) {
+        var w = waves[current];
+        current = (current + 1) % MAX_WAVES;
+        w.x = x; w.y = y;
+        w.scale = START_SCALE * power;
+        w.target = START_SCALE * Math.max(1, 5) * power;
+        w.size = Math.max(1, 150);
+        w.opacity = 1;
+      }
+      function localPoint(cx, cy) {
+        var r = rippleEl.getBoundingClientRect();
+        if (r.width === 0 || r.height === 0) return null;
+        if (cx < r.left || cx > r.right || cy < r.top || cy > r.bottom) return null;
+        return [cx - r.left, r.height - (cy - r.top)];
+      }
+
+      var px = 0, py = 0;
+      function onMove(e) {
+        if (reduceMotion) return;
+        var p = localPoint(e.clientX, e.clientY);
+        if (!p) return;
+        var step = Math.max(1, 15);
+        if (Math.abs(p[0] - px) > step || Math.abs(p[1] - py) > step) {
+          setWave(p[0], p[1], 1);
+          px = p[0]; py = p[1];
         }
-        // 鼠标连线
-        dx = p.x - mouse.x; dy = p.y - mouse.y;
-        d = dx * dx + dy * dy;
-        if (d < 220 * 220) {
-          ctx.strokeStyle = 'rgba(255,184,41,' + (0.35 * (1 - Math.sqrt(d) / 220)) + ')';
-          ctx.lineWidth = 1;
-          ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
+      }
+      window.addEventListener('pointermove', onMove, { passive: true });
+
+      var raf = 0, prevTime = 0;
+      function loop(now) {
+        raf = requestAnimationFrame(loop);
+        var delta = prevTime ? Math.min(0.05, (now - prevTime) / 1000) : 0;
+        prevTime = now;
+        var growth = reduceMotion ? 0 : 1 - Math.exp(-delta * 1.09);
+        var decay = reduceMotion ? 1 : Math.exp((-delta * LIFE_CONSTANT) / Math.max(0.15, 3));
+        for (var i = 0; i < MAX_WAVES; i++) {
+          var w = waves[i];
+          if (w.opacity <= 0) { opacities[i] = 0; continue; }
+          w.opacity *= decay;
+          w.scale += (w.target - w.scale) * growth;
+          if (w.opacity < 0.002) { w.opacity = 0; opacities[i] = 0; continue; }
+          var half = (w.scale * w.size) / 2;
+          offsets[i * 2] = (w.x / width) * 2 - 1;
+          offsets[i * 2 + 1] = (w.y / height) * 2 - 1;
+          scales[i * 2] = (half / width) * 2;
+          scales[i * 2 + 1] = (half / height) * 2;
+          opacities[i] = w.opacity;
         }
+        geometry.attributes.iOffset.needsUpdate = true;
+        geometry.attributes.iScale.needsUpdate = true;
+        geometry.attributes.iOpacity.needsUpdate = true;
+        renderer.render({ scene: waveMesh, target: displacementTarget, clear: true });
+        renderer.render({ scene: compositeMesh });
       }
-      // 粒子（闪烁）
-      for (i = 0; i < parts.length; i++) {
-        p = parts[i];
-        var a = .35 + .5 * Math.abs(Math.sin(p.tw));
-        ctx.globalAlpha = a;
-        ctx.fillStyle = p.c;
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
-      }
-      ctx.globalAlpha = 1;
-      requestAnimationFrame(frame);
+      raf = requestAnimationFrame(loop);
+    } catch (err) {
+      rippleEl.style.display = 'none';
+      window.__rippleErr = err && err.message ? err.message : String(err);
     }
-    hero.addEventListener('mousemove', function (e) {
-      var r = hero.getBoundingClientRect();
-      mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top;
-    });
-    hero.addEventListener('mouseleave', function () { mouse.x = -9999; mouse.y = -9999; });
-    window.addEventListener('resize', function () { resize(); seed(); });
-    resize(); seed(); frame();
   }
 
   /* ============ 3. 滚动揭示（多方向 + 延迟 + 安全兜底） ============ */
