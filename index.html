@@ -1,317 +1,320 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>冯新波 · AI产品经理</title>
-<meta name="description" content="冯新波，AI产品经理。专注 AI 产品拆解、Agent 工作流与提示词工程。" />
-
-<style>
-  :root {
-    --bg: #fdfdfd;         /* 米白底 */
-    --bg-soft: #f6f6f3;    /* 浅暖灰 */
-    --bg-soft-2: #efeeea;  /* 更浅暖灰 */
-    --ink: #222222;        /* 主文字 */
-    --ink-soft: #444444;   /* 次级文字 */
-    --ink-mute: #777777;   /* 弱文字 */
-    --ink-faint: #999999;  /* 更弱文字 */
-    --rule: #e6e4dd;       /* 分隔线 */
-    --accent: #d26911;     /* 橙色点缀 */
-    --accent-hover: #b35309;
-    --max: 1080px;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-
-  body {
-    font-family: -apple-system, "system-ui", "SF Pro Text", "PingFang SC",
-      "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
-    background: var(--bg);
-    color: var(--ink);
-    font-size: 15px;
-    line-height: 1.75;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  a { color: inherit; text-decoration: none; }
-  a:hover { color: var(--accent); }
-  ul { list-style: none; }
-
-  .container { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
-
-  /* ---------- 顶栏 ---------- */
-  header {
-    position: sticky; top: 0; z-index: 50;
-    background: rgba(253,253,253,.92);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--rule);
-  }
-  .nav { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 20px; }
-  .brand { font-weight: 700; font-size: 16px; color: var(--ink); white-space: nowrap; }
-  .brand .tagline { font-weight: 400; color: var(--ink-mute); }
-  .nav-links { display: flex; gap: 26px; }
-  .nav-links a { font-size: 14px; color: var(--ink-soft); }
-  .nav-links a:hover { color: var(--accent); }
-  .nav-gh { font-size: 14px; color: var(--ink-soft); white-space: nowrap; }
-  .nav-gh:hover { color: var(--accent); }
-  @media (max-width: 680px) { .brand .tagline { display: none; } .nav-links { gap: 16px; } }
-
-  /* ---------- Hero ---------- */
-  .hero { padding: 72px 0 40px; }
-  .hero h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
-  .hero .sub { font-size: 17px; color: var(--ink-soft); margin-top: 10px; }
-  .hero .intro { font-size: 15px; color: var(--ink-mute); max-width: 620px; margin-top: 16px; }
-  .hero .intro a { color: var(--accent); }
-
-  /* 统计卡片 */
-  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 36px; }
-  @media (max-width: 680px) { .cards { grid-template-columns: 1fr; } }
-  .card {
-    display: flex; align-items: flex-start; gap: 14px;
-    background: var(--bg-soft); border: 1px solid var(--rule); border-radius: 10px;
-    padding: 20px; transition: border-color .2s, transform .2s;
-  }
-  .card:hover { border-color: var(--accent); transform: translateY(-2px); }
-  .card .num { font-size: 28px; font-weight: 800; color: var(--accent); line-height: 1.1; }
-  .card h3 { font-size: 16px; font-weight: 700; }
-  .card p { font-size: 13px; color: var(--ink-mute); margin-top: 2px; }
-  .card .arrow { margin-left: auto; color: var(--ink-faint); font-size: 18px; align-self: center; }
-
-  /* ---------- 两栏布局 ---------- */
-  .layout { display: grid; grid-template-columns: 1fr 300px; gap: 48px; padding: 40px 0 64px; }
-  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
-
-  /* 主栏 section */
-  .main section { margin-bottom: 56px; }
-  .sec-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 20px; }
-  .sec-head h2 { font-size: 20px; font-weight: 700; }
-  .sec-head .all { font-size: 13px; color: var(--ink-mute); }
-  .sec-head .all:hover { color: var(--accent); }
-
-  .about-text .lead { font-size: 16px; color: var(--ink); font-weight: 600; margin-bottom: 14px; }
-  .about-text p { font-size: 14px; color: var(--ink-soft); margin-bottom: 12px; }
-
-  /* 项目列表 */
-  .project-item { padding: 22px 0; border-top: 1px solid var(--rule); }
-  .project-item:last-child { border-bottom: 1px solid var(--rule); }
-  .project-item .meta { font-size: 12px; color: var(--ink-faint); letter-spacing: .02em; margin-bottom: 6px; }
-  .project-item h3 { font-size: 18px; font-weight: 700; }
-  .project-item h3 a:hover { color: var(--accent); }
-  .project-item h3 .repo { font-weight: 400; font-size: 13px; color: var(--ink-faint); margin-left: 6px; }
-  .project-item .tags { margin-top: 6px; }
-  .project-item .tag { display: inline-block; font-size: 12px; color: var(--accent); background: var(--bg-soft); border-radius: 4px; padding: 2px 8px; margin-right: 6px; }
-  .project-item p { font-size: 14px; color: var(--ink-mute); margin-top: 8px; max-width: 640px; }
-
-  /* 博客列表 */
-  .post-item { padding: 22px 0; border-top: 1px solid var(--rule); }
-  .post-item:last-child { border-bottom: 1px solid var(--rule); }
-  .post-item h3 { font-size: 17px; font-weight: 700; }
-  .post-item h3 a:hover { color: var(--accent); }
-  .post-item .meta { font-size: 13px; color: var(--ink-faint); margin-top: 4px; }
-  .post-item .meta .cat { color: var(--accent); }
-  .post-item p { font-size: 14px; color: var(--ink-mute); margin-top: 8px; }
-  .post-item .more { font-size: 13px; color: var(--ink-soft); margin-top: 6px; display: inline-block; }
-  .post-item .more:hover { color: var(--accent); }
-
-  /* ---------- 侧栏 ---------- */
-  .sidebar section { margin-bottom: 36px; }
-  .sidebar h2 { font-size: 15px; font-weight: 700; margin-bottom: 14px; color: var(--ink); }
-  .sidebar .about-me { display: flex; gap: 14px; align-items: flex-start; }
-  .avatar {
-    width: 52px; height: 52px; border-radius: 50%; flex-shrink: 0;
-    background: var(--bg-soft-2); color: var(--accent);
-    display: grid; place-items: center; font-size: 22px; font-weight: 700;
-  }
-  .sidebar .about-me p { font-size: 13.5px; color: var(--ink-soft); }
-  .sidebar .about-me p + p { margin-top: 6px; }
-  .sidebar .about-me .name { font-weight: 700; color: var(--ink); font-size: 15px; }
-  .sidebar .about-me a { color: var(--accent); }
-
-  /* 能力列表 */
-  .skill-list li { padding: 8px 0; border-top: 1px solid var(--rule); font-size: 14px; color: var(--ink-soft); }
-  .skill-list li:first-child { border-top: none; }
-  .skill-list li b { font-weight: 600; color: var(--ink); }
-
-  /* 分类 */
-  .cat-list li { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; }
-  .cat-list li a { color: var(--ink-soft); }
-  .cat-list li a:hover { color: var(--accent); }
-  .cat-list li .count { color: var(--ink-faint); }
-
-  /* 联系 */
-  .contact-list li { padding: 6px 0; font-size: 14px; }
-  .contact-list a { color: var(--ink-soft); }
-  .contact-list a:hover { color: var(--accent); }
-
-  /* ---------- 页脚 ---------- */
-  footer { border-top: 1px solid var(--rule); padding: 32px 0; }
-  .footer-inner { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--ink-faint); }
-  .footer-inner .links { display: flex; gap: 16px; }
-  .footer-inner .links a { color: var(--ink-mute); }
-  .footer-inner .links a:hover { color: var(--accent); }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>冯新波 · AI产品经理</title>
+  <meta name="description" content="冯新波的个人主页：AI产品经理，关注大模型如何真正落地为产品价值。产品拆解、Agent 工作流与公众号文章。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Doto:wght@400..900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-<!-- ===================== 顶栏 ===================== -->
-<header>
-  <div class="container nav">
-    <a class="brand" href="#top">冯新波 <span class="tagline">· AI产品经理</span></a>
-    <nav class="nav-links">
-      <a href="#about">背景</a>
-      <a href="#projects">项目</a>
-      <a href="#blog">博客</a>
-    </nav>
-    <a class="nav-gh" href="https://github.com/fengxinbo558" target="_blank" rel="noopener">GitHub ↗</a>
+  <!-- ============ 加载页 ============ -->
+  <div id="loader" class="loader">
+    <div class="spinner"></div>
   </div>
-</header>
 
-<main class="container" id="top">
+  <!-- ============ 全屏菜单 ============ -->
+  <nav id="menu" class="menu" aria-hidden="true">
+    <ul class="menu-nav">
+      <li><a class="blink-text" href="#hero">首页</a></li>
+      <li><a class="blink-text" href="#posts">文章</a></li>
+      <li><a class="blink-text" href="#series">专栏</a></li>
+      <li><a class="blink-text" href="#about">关于</a></li>
+      <li><a class="blink-text" href="#contact">联系</a></li>
+    </ul>
+    <a class="btn primary-btn blink-text menu-cta" href="#posts">查看文章</a>
+  </nav>
 
-  <!-- ===================== Hero ===================== -->
-  <section class="hero">
-    <h1>冯新波</h1>
-    <p class="sub">AI产品经理 · 专注 AI 产品拆解与 Agent 工作流</p>
-    <p class="intro">
-      从真实操作中还原产品逻辑，把洞察沉淀为可复用的 Agent 工作流与提示词体系。
-      <a href="#about">了解更多 →</a>
-    </p>
-
-    <div class="cards">
-      <a class="card" href="#projects">
-        <span class="num">01</span>
-        <div><h3>项目</h3><p>个人项目 · 声音导演</p></div>
-        <span class="arrow">→</span>
-      </a>
-      <a class="card" href="#skills">
-        <span class="num">06</span>
-        <div><h3>能力</h3><p>从拆解到沉淀</p></div>
-        <span class="arrow">→</span>
-      </a>
-      <a class="card" href="#blog">
-        <span class="num">03</span>
-        <div><h3>博客</h3><p>文章与思考 · 持续输出</p></div>
-        <span class="arrow">→</span>
-      </a>
+  <!-- ============ 顶栏 ============ -->
+  <header id="header" class="header">
+    <div class="container header-inner">
+      <a class="logo" href="#hero">冯新波<span>.</span></a>
+      <nav class="main-nav" aria-label="主导航">
+        <a class="blink-text" href="#hero">首页</a>
+        <a class="blink-text" href="#posts">文章</a>
+        <a class="blink-text" href="#series">专栏</a>
+        <a class="blink-text" href="#about">关于</a>
+        <a class="blink-text" href="#contact">联系</a>
+      </nav>
+      <div class="header-right">
+        <a class="btn primary-btn" href="https://github.com/fengxinbo558" target="_blank" rel="noopener" title="GitHub">
+          <svg class="gh-icon" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+          <span class="blink-text">GitHub</span>
+        </a>
+        <button class="hamburger" id="hamburger" aria-label="打开菜单" aria-expanded="false">
+          <span></span><span></span>
+        </button>
+      </div>
     </div>
-  </section>
+  </header>
 
-  <!-- ===================== 两栏 ===================== -->
-  <div class="layout">
+  <main id="main">
 
-    <!-- ---------- 主栏 ---------- -->
-    <div class="main">
-
-      <!-- 个人背景 -->
-      <section id="about">
-        <div class="sec-head">
-          <h2>个人背景</h2>
+    <!-- ============ Hero ============ -->
+    <section id="hero" class="hero">
+      <div class="hero-bg" aria-hidden="true"></div>
+      <div class="container hero-inner">
+        <p class="hero-name">冯新波 · AI产品经理</p>
+        <h1 class="display split-text">冯新波</h1>
+        <p class="hero-sub">把 AI 能力，变成人们每天用得上的产品</p>
+        <div class="hero-buttons">
+          <a class="btn primary-btn blink-text" href="#posts">查看文章</a>
+          <a class="btn ghost-btn blink-text" href="#about">关于我</a>
         </div>
-        <div class="about-text">
-          <p class="lead">我是一名 AI 产品经理，关注大模型如何从「会聊天」真正走向「能干活」。</p>
-          <p>我做的事很朴素：把 AI 能力变成人们每天用得上的产品——从需求洞察、方案设计，到 Agent 工作流与自动化落地。</p>
-          <p>我相信 AI 正在重塑人和工具的关系。未来最稀缺的产品能力，是既懂模型边界、又能定义真实问题，在「技术可能」和「用户需要」之间找到恰到好处的落点。</p>
-          <p>平时喜欢研究各种 AI 产品，观察它们的取舍与演进，也把自己踩过的坑沉淀成可复用的方法论。</p>
-        </div>
-      </section>
+      </div>
+      <a class="scroll-hint" href="#about" aria-label="向下滚动">
+        <span>SCROLL</span>
+        <i></i>
+      </a>
+    </section>
 
-      <!-- 项目 -->
-      <section id="projects">
-        <div class="sec-head">
-          <h2>项目</h2>
-          <a class="all" href="https://github.com/fengxinbo558" target="_blank" rel="noopener">GitHub →</a>
+    <!-- ============ 关于 + 数据 ============ -->
+    <section id="about" class="about">
+      <div class="container">
+        <p class="section-label">ABOUT ME</p>
+        <h2 class="about-title split-text">TURNING MODELS INTO PRODUCTS PEOPLE USE</h2>
+        <p class="about-intro">冯新波，AI产品经理。相信 AI 正在重塑人和工具的关系——把大模型能力，变成人们每天用得上的产品。</p>
+        <div class="stats">
+          <div class="stat stat-avatar clip-lg reveal">
+            <img src="avatar.svg" alt="个人头像" />
+            <span class="stat-avatar-mask" aria-hidden="true"></span>
+            <div class="stat-avatar-text">
+              <span class="avatar-name">冯新波</span>
+              <a class="avatar-wechat" href="https://mp.weixin.qq.com/s/t1m4CRxeSTAquwfZ5ij9jw" target="_blank" rel="noopener">公众号 AI超人强</a>
+            </div>
+          </div>
+          <a class="stat stat-link clip-lg reveal" href="https://github.com/fengxinbo558" target="_blank" rel="noopener">
+            <span class="stat-link-title">GitHub</span>
+            <span class="stat-link-go">前往 →</span>
+          </a>
+          <a class="stat stat-link clip-lg reveal" href="https://github.com/fengxinbo558/rensheng" target="_blank" rel="noopener">
+            <span class="stat-link-title">项目 · 声音导演</span>
+            <span class="stat-link-go">前往 →</span>
+          </a>
+          <a class="stat stat-link clip-lg reveal" href="https://mp.weixin.qq.com/s/t1m4CRxeSTAquwfZ5ij9jw" target="_blank" rel="noopener">
+            <span class="stat-link-title">公众号 · AI超人强</span>
+            <span class="stat-link-go">前往 →</span>
+          </a>
         </div>
+      </div>
+    </section>
 
-        <div class="project-item">
-          <div class="meta">PERSONAL PROJECT — macOS · 离线语音</div>
-          <h3><a href="https://github.com/fengxinbo558/rensheng" target="_blank" rel="noopener">声音导演<span class="repo">rensheng</span> ↗</a></h3>
-          <div class="tags"><span class="tag">macOS</span><span class="tag">离线 TTS</span><span class="tag">音色克隆</span><span class="tag">有声出版</span></div>
-          <p>本地离线为主的 macOS 私人声音出版台：加入文字、PDF 或网页，选好音色即可生成朗读音频，导出 WAV / M4A / MP3，支持自定义个人音色。</p>
+    <!-- ============ 最新文章（sticky） ============ -->
+    <section id="posts" class="posts">
+      <div class="container posts-grid">
+        <div class="posts-left">
+          <div class="posts-sticky">
+            <p class="section-label">LATEST</p>
+            <h2 class="title split-text">NEW<br />NOTES</h2>
+            <p class="posts-intro">最新的文章，点击跳转到公众号原文。</p>
+            <a class="btn primary-btn blink-text" href="#contact">联系我</a>
+          </div>
         </div>
-      </section>
-
-      <!-- 博客 -->
-      <section id="blog">
-        <div class="sec-head">
-          <h2>最近在写</h2>
-          <a class="all" href="#blog">全部 →</a>
+        <div class="posts-right">
+          <a class="post-row reveal" href="https://mp.weixin.qq.com/s/vXqV_QBgE5vNep-U0-KMqw" target="_blank" rel="noopener">
+            <span class="post-no">01</span>
+            <div class="post-row-body">
+              <h3 class="post-row-title">ChatGPT 不想只和你聊天了：它正在争夺工作的默认入口</h3>
+              <p class="post-row-excerpt">当 ChatGPT 从「聊天窗口」走向「工作入口」，AI 产品的竞争逻辑正在改变。</p>
+              <div class="post-row-tags"><span>产品分析</span><span>AI 产品</span></div>
+            </div>
+            <span class="post-row-date">2026.08</span>
+          </a>
+          <a class="post-row reveal" href="https://mp.weixin.qq.com/s/Qb1ArAg-xoccDqcfecveEQ" target="_blank" rel="noopener">
+            <span class="post-no">02</span>
+            <div class="post-row-body">
+              <h3 class="post-row-title">AI 知识库最大的错觉：资料可以问，不等于知识被管理了</h3>
+              <p class="post-row-excerpt">把资料丢进知识库就能「问得到」，但不等于「管得好」——AI 知识库真正的门槛在哪。</p>
+              <div class="post-row-tags"><span>产品分析</span><span>知识库</span></div>
+            </div>
+            <span class="post-row-date">2026.08</span>
+          </a>
+          <a class="post-row reveal" href="https://mp.weixin.qq.com/s/t1m4CRxeSTAquwfZ5ij9jw" target="_blank" rel="noopener">
+            <span class="post-no">03</span>
+            <div class="post-row-body">
+              <h3 class="post-row-title">我养了一个越来越像我的AI，最后却只敢让它做最简单的事</h3>
+              <p class="post-row-excerpt">一次对 Second Me 的深度拆解：养了一个越来越像自己的 AI，最后却只敢让它做最简单的事。</p>
+              <div class="post-row-tags"><span>产品分析</span><span>案例拆解</span></div>
+            </div>
+            <span class="post-row-date">2026.08</span>
+          </a>
         </div>
+      </div>
+    </section>
 
-        <div class="post-item">
-          <h3><a href="https://mp.weixin.qq.com/s/vXqV_QBgE5vNep-U0-KMqw" target="_blank" rel="noopener">ChatGPT 不想只和你聊天了：它正在争夺工作的默认入口</a></h3>
-          <div class="meta">2026-08-09 · <span class="cat">产品分析</span> · 公众号「AI超人强」</div>
-          <p>当 ChatGPT 从「聊天窗口」走向「工作入口」，AI 产品的竞争逻辑正在改变。</p>
-          <a class="more" href="https://mp.weixin.qq.com/s/vXqV_QBgE5vNep-U0-KMqw" target="_blank" rel="noopener">阅读全文 ↗</a>
+    <!-- ============ 专栏 ============ -->
+    <section id="series" class="series">
+      <div class="container">
+        <div class="section-head">
+          <p class="section-label">SERIES</p>
+          <h2 class="title split-text">WHAT I WRITE</h2>
         </div>
-
-        <div class="post-item">
-          <h3><a href="https://mp.weixin.qq.com/s/Qb1ArAg-xoccDqcfecveEQ" target="_blank" rel="noopener">AI 知识库最大的错觉：资料可以问，不等于知识被管理了</a></h3>
-          <div class="meta">2026-08-09 · <span class="cat">产品分析</span> · 公众号「AI超人强」</div>
-          <p>把资料丢进知识库就能「问得到」，但不等于「管得好」——AI 知识库真正的门槛在哪。</p>
-          <a class="more" href="https://mp.weixin.qq.com/s/Qb1ArAg-xoccDqcfecveEQ" target="_blank" rel="noopener">阅读全文 ↗</a>
+        <div class="series-wrap">
+          <div class="series-list">
+            <button class="series-item clip-lg-invert is-active" data-index="0">
+              <h3>产品拆解</h3>
+              <p>打开产品，还原设计逻辑</p>
+            </button>
+            <button class="series-item clip-lg" data-index="1">
+              <h3>AI 产品分析</h3>
+              <p>大模型产品的取舍与演进</p>
+            </button>
+            <button class="series-item clip-lg-invert" data-index="2">
+              <h3>Agent 工作流</h3>
+              <p>把重复的事交给自动化</p>
+            </button>
+            <button class="series-item clip-lg" data-index="3">
+              <h3>随笔</h3>
+              <p>关于 AI、产品与思考</p>
+            </button>
+          </div>
+          <div class="series-visual">
+            <div class="series-panel clip-lg is-active" data-index="0">
+              <span class="panel-no">01</span>
+              <span class="panel-name">产品拆解</span>
+              <span class="panel-tags">案例分析 · 用户逻辑 · 事实核验</span>
+            </div>
+            <div class="series-panel clip-lg" data-index="1">
+              <span class="panel-no">02</span>
+              <span class="panel-name">AI 产品分析</span>
+              <span class="panel-tags">产品策略 · 竞争格局 · 演进</span>
+            </div>
+            <div class="series-panel clip-lg" data-index="2">
+              <span class="panel-no">03</span>
+              <span class="panel-name">Agent 工作流</span>
+              <span class="panel-tags">自动化 · 技能工程 · 效率</span>
+            </div>
+            <div class="series-panel clip-lg" data-index="3">
+              <span class="panel-no">04</span>
+              <span class="panel-name">随笔</span>
+              <span class="panel-tags">思考 · 审美 · 长期主义</span>
+            </div>
+          </div>
         </div>
+      </div>
+    </section>
 
-        <div class="post-item">
-          <h3><a href="https://mp.weixin.qq.com/s/t1m4CRxeSTAquwfZ5ij9jw" target="_blank" rel="noopener">我养了一个越来越像我的AI，最后却只敢让它做最简单的事</a></h3>
-          <div class="meta">2026-08-06 · <span class="cat">产品分析</span> · 公众号「AI超人强」</div>
-          <p>一次对 Second Me 的深度拆解：养了一个越来越像自己的 AI，最后却只敢让它做最简单的事。</p>
-          <a class="more" href="https://mp.weixin.qq.com/s/t1m4CRxeSTAquwfZ5ij9jw" target="_blank" rel="noopener">阅读全文 ↗</a>
+    <!-- ============ 技能 ============ -->
+    <section id="skills" class="skills">
+      <div class="container">
+        <div class="section-head">
+          <p class="section-label">TOOLKIT</p>
+          <h2 class="title split-text">WHAT I USE</h2>
         </div>
+        <div class="skills-grid">
+          <div class="skill reveal">
+            <div class="skill-top">
+              <h3>AI 产品拆解</h3>
+              <span class="counter" data-target="90">0</span><span>%</span>
+            </div>
+            <div class="skill-bar"><div data-width="90%"></div></div>
+          </div>
+          <div class="skill reveal">
+            <div class="skill-top">
+              <h3>Agent 工作流</h3>
+              <span class="counter" data-target="85">0</span><span>%</span>
+            </div>
+            <div class="skill-bar"><div data-width="85%"></div></div>
+          </div>
+          <div class="skill reveal">
+            <div class="skill-top">
+              <h3>提示词工程</h3>
+              <span class="counter" data-target="80">0</span><span>%</span>
+            </div>
+            <div class="skill-bar"><div data-width="80%"></div></div>
+          </div>
+          <div class="skill reveal">
+            <div class="skill-top">
+              <h3>需求洞察</h3>
+              <span class="counter" data-target="78">0</span><span>%</span>
+            </div>
+            <div class="skill-bar"><div data-width="78%"></div></div>
+          </div>
+        </div>
+        <ul class="skill-tags">
+          <li>AI Agent</li><li>Codex</li><li>Dify</li><li>Obsidian</li><li>GitHub</li><li>飞书</li><li>提示词工程</li>
+        </ul>
+      </div>
+    </section>
 
-      </section>
+    <!-- ============ 跑马灯 ============ -->
+    <section class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <div class="marquee-item"><span>AI 产品拆解</span><i>+</i></div>
+        <div class="marquee-item"><span>Agent 工作流</span><i>+</i></div>
+        <div class="marquee-item"><span>提示词工程</span><i>+</i></div>
+        <div class="marquee-item"><span>产品分析</span><i>+</i></div>
+        <div class="marquee-item"><span>知识沉淀</span><i>+</i></div>
+      </div>
+    </section>
+
+    <!-- ============ FAQ ============ -->
+    <section id="faq" class="faq">
+      <div class="container faq-grid">
+        <div class="faq-left">
+          <p class="section-label">YOUR QUESTIONS</p>
+          <h2 class="title split-text">FAQ</h2>
+          <p class="faq-intro">关于我和这个主页，你可能想知道的几件事。</p>
+          <a class="btn primary-btn blink-text" href="#contact">联系我</a>
+        </div>
+        <div class="faq-list">
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false">我是谁？<span>+</span></button>
+            <div class="faq-a"><p>冯新波，AI 产品经理，关注大模型如何真正落地为产品价值。</p></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false">这个主页主要放什么？<span>+</span></button>
+            <div class="faq-a"><p>我的公众号文章、产品拆解笔记，以及个人项目「声音导演」。</p></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false">文章可以转载吗？<span>+</span></button>
+            <div class="faq-a"><p>欢迎转载，注明出处与作者即可。</p></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false">怎么联系我？<span>+</span></button>
+            <div class="faq-a"><p>下方邮箱、GitHub，或到公众号「AI超人强」留言。</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 联系 ============ -->
+    <section id="contact" class="contact">
+      <div class="container">
+        <div class="section-head center">
+          <p class="section-label">CONTACT</p>
+          <h2 class="title split-text">GET IN TOUCH</h2>
+        </div>
+        <div class="contact-info">
+          <!-- CONTACT：替换为真实邮箱 -->
+          <a href="mailto:you@example.com">you@example.com</a>
+          <span>公众号：AI超人强</span>
+          <a href="https://github.com/fengxinbo558" target="_blank" rel="noopener">GitHub</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ 页脚 ============ -->
+  <footer id="footer" class="footer">
+    <div class="container">
+      <button class="scroll-top" id="scrollTop" aria-label="回到顶部">↑</button>
+      <h2 class="footer-title">冯新波</h2>
+      <p class="footer-tag">冯新波 · AI产品经理 —— 把 AI 能力，变成人们每天用得上的产品。</p>
+      <div class="social footer-social">
+        <a href="mailto:you@example.com">邮箱</a>
+        <a href="https://github.com/fengxinbo558" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://mp.weixin.qq.com/s/t1m4CRxeSTAquwfZ5ij9jw" target="_blank" rel="noopener">公众号</a>
+      </div>
+      <p class="footer-copy">© <span id="year"></span> 冯新波 · All rights reserved.</p>
     </div>
+  </footer>
 
-    <!-- ---------- 侧栏 ---------- -->
-    <aside class="sidebar">
-
-      <!-- 能力 · 从拆解到沉淀 -->
-      <section id="skills">
-        <h2>能力 · 从拆解到沉淀</h2>
-        <ul class="skill-list">
-          <li><b>AI 产品拆解</b> — 逐条取证，还原产品逻辑</li>
-          <li><b>需求洞察</b> — 定义真实问题与优先级</li>
-          <li><b>Agent 工作流</b> — 洞察可复制、可扩展</li>
-          <li><b>提示词工程</b> — 面向专业内容创作</li>
-          <li><b>证据驱动分析</b> — 拒绝脑补式结论</li>
-          <li><b>知识库沉淀</b> — 可持续迭代的体系</li>
-        </ul>
-      </section>
-
-      <!-- 分类 -->
-      <section>
-        <h2>分类</h2>
-        <ul class="cat-list">
-          <li><a href="#blog">产品分析</a><span class="count">3</span></li>
-        </ul>
-      </section>
-
-      <!-- 联系 -->
-      <section>
-        <h2>联系</h2>
-        <ul class="contact-list">
-          <!-- CONTACT：替换为真实邮箱 / 微信 -->
-          <li><a href="mailto:you@example.com">📧 邮箱</a></li>
-          <li><a href="#">💬 微信</a></li>
-          <li><a href="https://github.com/fengxinbo558" target="_blank" rel="noopener">🐙 GitHub</a></li>
-        </ul>
-      </section>
-    </aside>
-  </div>
-</main>
-
-<!-- ===================== 页脚 ===================== -->
-<footer>
-  <div class="container footer-inner">
-    <div>© 2026 冯新波 · AI产品经理</div>
-    <div class="links">
-      <a href="https://github.com/fengxinbo558" target="_blank" rel="noopener">GitHub</a>
-      <a href="#about">关于</a>
-      <a href="#blog">博客</a>
-    </div>
-  </div>
-</footer>
-
+  <script src="script.js"></script>
 </body>
 </html>
