@@ -52,7 +52,16 @@
   body {
     font-family: var(--font-sans);
     font-weight: 400;
-    background: var(--void);
+    background-color: var(--void);
+    background-image:
+      linear-gradient(rgba(247,249,250,0.022) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(247,249,250,0.022) 1px, transparent 1px),
+      radial-gradient(circle closest-corner at 6% -2%, rgba(108,75,214,0.5), transparent 55%),
+      radial-gradient(circle closest-corner at 98% 8%, rgba(175,80,255,0.34), transparent 58%),
+      radial-gradient(circle closest-side at 50% 112%, rgba(108,75,214,0.22), transparent 60%),
+      radial-gradient(circle closest-side at 40% 60%, rgba(175,80,255,0.10), transparent 60%);
+    background-size: 80px 80px, 80px 80px, auto, auto, auto, auto;
+    background-attachment: fixed;
     color: var(--almost-white);
     line-height: 1.7;
     -webkit-font-smoothing: antialiased;
@@ -93,12 +102,24 @@
   @media (max-width: 760px) { .nav-links { display: none; } }
 
   /* ---------- Hero ---------- */
-  .hero { padding: 140px 0 120px; position: relative; }
+  .hero { padding: 140px 0 120px; position: relative; overflow: hidden; }
   .hero::after {
-    content: ""; position: absolute; inset: 0; pointer-events: none;
-    background:
-      radial-gradient(720px 380px at 78% 0%, rgba(175, 80, 255, 0.10), transparent 70%),
-      radial-gradient(520px 320px at 10% 100%, rgba(175, 80, 255, 0.05), transparent 70%);
+    content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background: linear-gradient(0deg, var(--void), transparent 24%);
+  }
+  .hero-orb {
+    position: absolute; border-radius: 50%; pointer-events: none; z-index: 0;
+    filter: blur(50px);
+    animation: orb-pulse 7s ease-in-out infinite;
+  }
+  .hero-orb.a { top: -160px; left: -120px; width: 660px; height: 660px;
+    background: radial-gradient(circle closest-side, rgba(108,75,214,0.58), rgba(108,75,214,0.2) 50%, transparent 76%); }
+  .hero-orb.b { top: -120px; right: -120px; width: 580px; height: 580px;
+    background: radial-gradient(circle closest-side, rgba(175,80,255,0.5), rgba(175,80,255,0.16) 52%, transparent 78%);
+    animation-delay: 3.5s; }
+  @keyframes orb-pulse {
+    0%, 100% { opacity: 0.65; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.07); }
   }
   .hero .container { position: relative; z-index: 1; }
 
@@ -170,7 +191,9 @@
   @media (max-width: 820px) { .about-grid { grid-template-columns: 1fr; } }
   .panel {
     border: 1px solid var(--hairline); border-radius: var(--r-card);
-    padding: var(--card-pad); background: transparent;
+    padding: var(--card-pad);
+    background: linear-gradient(160deg, rgba(247,249,250,0.035), rgba(247,249,250,0.012));
+    backdrop-filter: blur(6px);
   }
   .panel p { color: var(--steel); font-size: 15px; font-weight: 300; }
   .panel p + p { margin-top: 16px; }
@@ -185,9 +208,10 @@
   @media (max-width: 560px) { .grid-3 { grid-template-columns: 1fr; } }
   .cell {
     border: 1px solid var(--hairline); border-radius: var(--r-card);
-    padding: 32px; transition: border-color .25s, background .25s;
+    padding: 32px; transition: border-color .25s, background .25s, transform .25s;
+    background: linear-gradient(160deg, rgba(247,249,250,0.035), rgba(247,249,250,0.012));
   }
-  .cell:hover { border-color: rgba(247,249,250,.2); background: rgba(247,249,250,0.02); }
+  .cell:hover { border-color: rgba(175,80,255,.35); background: rgba(175,80,255,0.05); transform: translateY(-3px); }
   .cell .num {
     font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.16em;
     color: var(--ash); display: block; margin-bottom: 40px;
@@ -200,14 +224,16 @@
   .project {
     display: grid; grid-template-columns: 180px 1fr; gap: 32px; align-items: center;
     border: 1px solid var(--hairline); border-radius: var(--r-card); padding: 32px;
-    transition: border-color .25s, background .25s;
+    transition: border-color .25s, background .25s, transform .25s;
+    background: linear-gradient(160deg, rgba(247,249,250,0.035), rgba(247,249,250,0.012));
   }
-  .project:hover { border-color: rgba(247,249,250,.2); background: rgba(247,249,250,0.02); }
+  .project:hover { border-color: rgba(175,80,255,.35); background: rgba(175,80,255,0.05); transform: translateY(-3px); }
   @media (max-width: 720px) { .project { grid-template-columns: 1fr; gap: 20px; } }
   .project-mark {
     height: 120px; border-radius: var(--r-sm); display: grid; place-items: center;
-    font-size: 40px; background: rgba(247,249,250,0.04);
-    border: 1px solid var(--hairline-soft);
+    font-size: 40px;
+    background: linear-gradient(150deg, rgba(175,80,255,0.16), rgba(99,102,241,0.08));
+    border: 1px solid rgba(175,80,255,0.22);
   }
   .project-body .kicker {
     font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em;
@@ -296,6 +322,8 @@
 
 <!-- ===================== HERO ===================== -->
 <div class="hero">
+  <div class="hero-orb a"></div>
+  <div class="hero-orb b"></div>
   <div class="container">
     <div class="hero-label">AI PRODUCT MANAGER <span class="violet">/</span> 个人主页</div>
     <h1><span class="name">冯新波</span></h1>
