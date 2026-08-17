@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>冯新波 · AI产品经理</title>
+<meta name="description" content="冯新波，AI产品经理。专注 AI 产品拆解、用户旅程分析与 Agent 工作流设计。" />
+
+<!-- 设计规范：dope.security — Midnight terminal with violet beacons
+     字体回退：Whyte Inktrap→Inter · Whyte Inktrap Mono→JetBrains Mono · GrandSlang→Lora italic -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&family=Lora:ital,wght@1,400;1,500&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    /* —— 色彩：95% 无彩色 + 一抹紫罗兰 —— */
+    --void: #090909;          /* 页面画布 / 卡片表面 */
+    --iron: #423738;          /* 深色边框与分隔线 */
+    --graphite: #474747;      /* 卡片内部文字 / 细微分隔 */
+    --ash: #6b6b6b;           /* 辅助文字 */
+    --steel: #828384;         /* 次要文字 / 弱化边框 */
+    --soft-white: #f0f0f0;    /* 钢印式大写标签 */
+    --almost-white: #f7f9fa;  /* 主文字 / 图标 / 1px 边框 */
+    --violet: #af50ff;        /* 唯一彩色：填充与辉光 */
+    --lavender: #e1bdff;      /* 柔光浅紫 */
+
+    --hairline: rgba(247, 249, 250, 0.09);   /* 1px 发丝边框 */
+    --hairline-soft: rgba(247, 249, 250, 0.05);
+
+    /* —— 形状 —— */
+    --r-sm: 6px;
+    --r-btn: 8px;
+    --r-card: 19.2px;
+    --r-pill: 1584px;
+
+    /* —— 间距 —— */
+    --unit: 4px;
+    --max-w: 1200px;
+    --section-gap: 120px;
+    --card-pad: 40px;
+    --gap: 16px;
+
+    --font-sans: "Inter", "General Sans", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    --font-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, monospace;
+    --font-display: "Lora", "Tiempos Headline", Georgia, serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    background: var(--void);
+    color: var(--almost-white);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: 0.01em;
+  }
+
+  a { color: inherit; text-decoration: none; }
+  img { max-width: 100%; display: block; }
+  ul { list-style: none; }
+
+  .container { max-width: var(--max-w); margin: 0 auto; padding: 0 48px; }
+  @media (max-width: 720px) { .container { padding: 0 24px; } }
+
+  /* ---------- 导航（磨砂）---------- */
+  header {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(51, 50, 72, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .nav { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .logo { font-family: var(--font-mono); font-size: 14px; letter-spacing: 0.08em; color: var(--almost-white); }
+  .logo .dot { color: var(--steel); }
+  .nav-links { display: flex; gap: 32px; }
+  .nav-links a {
+    font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--steel); transition: color .2s;
+  }
+  .nav-links a:hover { color: var(--almost-white); }
+  .nav-cta {
+    padding: 8px 18px; border-radius: var(--r-btn); color: var(--almost-white);
+    background: transparent; border: 1px solid var(--hairline);
+    font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em;
+    transition: border-color .2s;
+  }
+  .nav-cta:hover { border-color: rgba(247,249,250,.28); }
+  @media (max-width: 760px) { .nav-links { display: none; } }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: 140px 0 120px; position: relative; }
+  .hero::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(720px 380px at 78% 0%, rgba(175, 80, 255, 0.10), transparent 70%),
+      radial-gradient(520px 320px at 10% 100%, rgba(175, 80, 255, 0.05), transparent 70%);
+  }
+  .hero .container { position: relative; z-index: 1; }
+
+  .hero-label {
+    font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--soft-white);
+  }
+  .hero-label .violet { color: var(--steel); }
+
+  .hero h1 {
+    font-family: var(--font-display); font-style: italic; font-weight: 400;
+    font-size: clamp(64px, 11vw, 146px);
+    line-height: 0.95; letter-spacing: -0.03em;
+    margin: 28px 0 8px; color: var(--almost-white);
+  }
+  .hero h1 .name { display: inline-block; }
+
+  .hero-sub {
+    font-family: var(--font-mono); font-size: clamp(16px, 2.4vw, 24px);
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--lavender); margin-bottom: 40px;
+  }
+
+  .hero p.lead {
+    font-size: 17px; font-weight: 300; color: var(--steel);
+    max-width: 560px; margin-bottom: 44px;
+  }
+
+  .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 26px; border-radius: var(--r-btn); font-size: 14px; font-weight: 500;
+    transition: background .2s, border-color .2s;
+    font-family: var(--font-sans);
+  }
+  .btn-primary { background: var(--violet); color: #fff; }
+  .btn-primary:hover { background: #c07aff; }
+  .btn-ghost { background: transparent; color: var(--almost-white); border: 1px solid var(--hairline); }
+  .btn-ghost:hover { border-color: rgba(247,249,250,.28); }
+
+  .hero-meta {
+    margin-top: 72px; display: flex; gap: 48px; flex-wrap: wrap;
+    border-top: 1px solid var(--hairline); padding-top: 28px;
+  }
+  .hero-meta .item b {
+    display: block; font-family: var(--font-mono); font-size: 28px; font-weight: 400;
+    color: var(--almost-white); letter-spacing: -0.02em;
+  }
+  .hero-meta .item span {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--ash);
+  }
+
+  /* ---------- 通用 section ---------- */
+  section { padding: var(--section-gap) 0; }
+  @media (max-width: 720px) { section { padding: 80px 0; } }
+
+  .section-head { margin-bottom: 56px; }
+  .stamp {
+    font-family: var(--font-mono); font-size: clamp(28px, 4.6vw, 56px);
+    font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase;
+    line-height: 0.9; color: var(--almost-white);
+  }
+  .stamp .idx { color: var(--steel); }
+  .section-head p { color: var(--steel); margin-top: 20px; max-width: 560px; font-size: 16px; font-weight: 300; }
+
+  /* ---------- 关于 ---------- */
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 820px) { .about-grid { grid-template-columns: 1fr; } }
+  .panel {
+    border: 1px solid var(--hairline); border-radius: var(--r-card);
+    padding: var(--card-pad); background: transparent;
+  }
+  .panel p { color: var(--steel); font-size: 15px; font-weight: 300; }
+  .panel p + p { margin-top: 16px; }
+  .panel .lead-word {
+    color: var(--almost-white); font-weight: 500;
+  }
+  .panel .violet-word { color: var(--lavender); font-weight: 400; }
+
+  /* ---------- 能力 ---------- */
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 900px) { .grid-3 { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .grid-3 { grid-template-columns: 1fr; } }
+  .cell {
+    border: 1px solid var(--hairline); border-radius: var(--r-card);
+    padding: 32px; transition: border-color .25s, background .25s;
+  }
+  .cell:hover { border-color: rgba(247,249,250,.2); background: rgba(247,249,250,0.02); }
+  .cell .num {
+    font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.16em;
+    color: var(--ash); display: block; margin-bottom: 40px;
+  }
+  .cell h3 { font-size: 17px; font-weight: 500; color: var(--almost-white); margin-bottom: 10px; }
+  .cell p { font-size: 14px; color: var(--steel); font-weight: 300; }
+
+  /* ---------- 项目 ---------- */
+  .projects { display: grid; gap: 16px; }
+  .project {
+    display: grid; grid-template-columns: 180px 1fr; gap: 32px; align-items: center;
+    border: 1px solid var(--hairline); border-radius: var(--r-card); padding: 32px;
+    transition: border-color .25s, background .25s;
+  }
+  .project:hover { border-color: rgba(247,249,250,.2); background: rgba(247,249,250,0.02); }
+  @media (max-width: 720px) { .project { grid-template-columns: 1fr; gap: 20px; } }
+  .project-mark {
+    height: 120px; border-radius: var(--r-sm); display: grid; place-items: center;
+    font-size: 40px; background: rgba(247,249,250,0.04);
+    border: 1px solid var(--hairline-soft);
+  }
+  .project-body .kicker {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--ash); margin-bottom: 10px;
+  }
+  .project-body h3 { font-size: 20px; font-weight: 500; color: var(--almost-white); margin-bottom: 8px; }
+  .project-body .tag { display: inline-block; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; padding: 4px 10px; border-radius: var(--r-sm); border: 1px solid var(--hairline); color: var(--steel); margin-right: 6px; margin-bottom: 6px; }
+  .project-body p { font-size: 14px; color: var(--steel); font-weight: 300; margin-top: 6px; }
+
+  /* ---------- 文章 ---------- */
+  .posts { display: grid; }
+  .post {
+    display: flex; justify-content: space-between; align-items: center; gap: 20px;
+    padding: 28px 0; border-bottom: 1px solid var(--hairline); transition: padding-left .2s;
+  }
+  .post:first-child { border-top: 1px solid var(--hairline); }
+  .post:hover { padding-left: 12px; }
+  .post h3 { font-size: 18px; font-weight: 500; color: var(--almost-white); }
+  .post .meta { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; color: var(--ash); margin-top: 6px; }
+  .post .arrow { font-family: var(--font-mono); font-size: 18px; color: var(--steel); flex-shrink: 0; transition: color .2s, transform .2s; }
+  .post:hover .arrow { color: var(--violet); transform: translateX(4px); }
+
+  /* ---------- 工具栈 ---------- */
+  .stack { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip {
+    padding: 10px 18px; border-radius: var(--r-btn); border: 1px solid var(--hairline);
+    font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.04em; color: var(--steel);
+    transition: border-color .2s, color .2s;
+  }
+  .chip:hover { border-color: rgba(247,249,250,.25); color: var(--almost-white); }
+
+  /* ---------- 联系（唯一辉光卡片）---------- */
+  .contact-card {
+    border-radius: var(--r-card); padding: 80px 48px; position: relative; overflow: hidden;
+    background: rgba(175, 80, 255, 0.07);
+    border: 1px solid rgba(175, 80, 255, 0.22);
+    box-shadow: 0 0 70px rgba(175, 80, 255, 0.12);   /* 唯一允许的辉光 */
+  }
+  .contact-card::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(560px 280px at 50% 0%, rgba(175,80,255,.25), transparent 70%);
+  }
+  .contact-card > * { position: relative; }
+  .contact-card .stamp { font-size: clamp(26px, 4vw, 44px); }
+  .contact-card p { color: var(--steel); margin-top: 16px; max-width: 520px; }
+  .contact-links { margin-top: 40px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .contact-links a {
+    padding: 13px 22px; border-radius: var(--r-btn); font-weight: 500; font-size: 14px;
+    border: 1px solid var(--hairline); color: var(--almost-white);
+    transition: border-color .2s, background .2s;
+  }
+  .contact-links a:hover { border-color: rgba(247,249,250,.3); }
+  .contact-links a.primary { color: var(--lavender); border-color: rgba(175,80,255,.4); background: transparent; }
+  .contact-links a.primary:hover { background: rgba(175,80,255,.15); }
+
+  /* ---------- 页脚（坐标钢印）---------- */
+  footer {
+    padding: 48px 0; border-top: 1px solid var(--hairline);
+  }
+  .footer-inner { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .footer-inner .stamp-line {
+    font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--ash);
+  }
+  .footer-inner .coord { font-family: var(--font-mono); font-size: 12px; color: var(--steel); letter-spacing: 0.04em; }
+  .footer-inner .coord b { color: var(--soft-white); font-weight: 400; }
+
+  /* 内容始终可见，无滚动隐藏动画 */
+</style>
+</head>
+<body>
+
+<!-- ===================== 导航 ===================== -->
+<header id="header">
+  <div class="container nav">
+    <div class="logo">fengxinbo<span class="dot">.</span>me</div>
+    <nav class="nav-links">
+      <a href="#about">关于</a>
+      <a href="#skills">能力</a>
+      <a href="#projects">案例</a>
+      <a href="#writing">文章</a>
+    </nav>
+    <a class="nav-cta" href="#contact">联系我</a>
+  </div>
+</header>
+
+<!-- ===================== HERO ===================== -->
+<div class="hero">
+  <div class="container">
+    <div class="hero-label">AI PRODUCT MANAGER <span class="violet">/</span> 个人主页</div>
+    <h1><span class="name">冯新波</span></h1>
+    <div class="hero-sub">AI产品经理</div>
+    <p class="lead">
+      专注 AI 产品的深度拆解与用户旅程分析，从真实操作中还原产品逻辑，
+      并把洞察沉淀为可复用的 Agent 工作流与提示词体系。
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#projects">查看拆解案例</a>
+      <a class="btn btn-ghost" href="#contact">与我联系</a>
+    </div>
+    <div class="hero-meta">
+      <div class="item"><b>10+</b><span>深度产品拆解</span></div>
+      <div class="item"><b>04</b><span>核心研究项目</span></div>
+      <div class="item"><b>01</b><span>Agent 工作流体系</span></div>
+      <div class="item"><b>∞</b><span>对 AI 的好奇心</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== 关于 ===================== -->
+<section id="about">
+  <div class="container">
+    <div class="section-head reveal">
+      <h2 class="stamp"><span class="idx">01</span> 关于我</h2>
+    </div>
+    <div class="about-grid">
+      <div class="panel reveal">
+        <p>
+          我是一名 <span class="lead-word">AI产品经理</span>，日常与 AI Agent、提示词工程、
+          自动化工作流打交道，关注大模型能力如何真正落地为产品价值。
+        </p>
+        <p>
+          我特别着迷于「<span class="violet-word">产品拆解</span>」这件事：不是看宣传页，而是打开产品、
+          逐条浏览真实操作记录，梳理出从输入需求到最终产出的完整用户旅程，
+          再判断哪些体验是好的、哪些是断裂的。
+        </p>
+      </div>
+      <div class="panel reveal">
+        <p>
+          我的方法强调「<span class="lead-word">证据优先</span>」：所有结论分为页面事实、
+          合理推断与尚未确认三类，避免用常识和宣传语脑补产品。
+        </p>
+        <p>
+          同时，我把拆解能力沉淀为可复用的 <span class="violet-word">Skill 与 Agent 工作流</span>，
+          让「看懂一个产品」变成一套可持续运转的系统，而非一次性手工作业。
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 能力 ===================== -->
+<section id="skills">
+  <div class="container">
+    <div class="section-head reveal">
+      <h2 class="stamp"><span class="idx">02</span> 我的能力</h2>
+      <p>从「看懂产品」到「沉淀方法」，我关注这六件事。</p>
+    </div>
+    <div class="grid-3">
+      <div class="cell reveal"><span class="num">/ 01</span><h3>AI 产品拆解</h3><p>基于真实页面操作，逐条取证，还原产品逻辑与关键决策点。</p></div>
+      <div class="cell reveal"><span class="num">/ 02</span><h3>用户旅程图</h3><p>从输入需求到最终产出，梳理完整流程、分支与纠偏路径。</p></div>
+      <div class="cell reveal"><span class="num">/ 03</span><h3>Agent 工作流设计</h3><p>把重复的分析动作编排成自动化 Agent，让洞察可复制、可扩展。</p></div>
+      <div class="cell reveal"><span class="num">/ 04</span><h3>提示词工程</h3><p>设计高质量提示词与 Skill，面向 AI 产品经理的专业内容创作。</p></div>
+      <div class="cell reveal"><span class="num">/ 05</span><h3>证据驱动分析</h3><p>区分「页面事实 / 合理推断 / 尚未确认」，拒绝脑补式结论。</p></div>
+      <div class="cell reveal"><span class="num">/ 06</span><h3>知识库沉淀</h3><p>用 Obsidian 等工具把拆解成果结构化，形成可持续迭代的知识体系。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 项目 ===================== -->
+<section id="projects">
+  <div class="container">
+    <div class="section-head reveal">
+      <h2 class="stamp"><span class="idx">03</span> 拆解案例</h2>
+      <p>每一份都是打开产品、基于真实操作记录完成的深度拆解。</p>
+    </div>
+    <div class="projects">
+      <div class="project reveal">
+        <div class="project-mark">🎬</div>
+        <div class="project-body">
+          <div class="kicker">Case Study — 视频生成</div>
+          <h3>OiiOii · AI 视频生成产品拆解</h3>
+          <span class="tag">用户旅程图</span><span class="tag">视频生成</span>
+          <p>从输入需求到产出视频的完整旅程，覆盖角色 / 场景 / 道具 / 分镜与纠偏路径。</p>
+        </div>
+      </div>
+      <div class="project reveal">
+        <div class="project-mark">🧠</div>
+        <div class="project-body">
+          <div class="kicker">Case Study — 四阶段框架</div>
+          <h3>Mindtrip.ai · 四阶段产品拆解</h3>
+          <span class="tag">四阶段框架</span><span class="tag">提示词</span>
+          <p>四阶段深度拆解提示词体系，系统化梳理产品从触达到转化的完整逻辑。</p>
+        </div>
+      </div>
+      <div class="project reveal">
+        <div class="project-mark">🗺️</div>
+        <div class="project-body">
+          <div class="kicker">Case Study — 旅行规划</div>
+          <h3>Wanderlog · 旅行规划产品拆解</h3>
+          <span class="tag">用户旅程图</span><span class="tag">旅行规划</span>
+          <p>拆解旅行规划产品的用户旅程，产出结构化分析报告与可视化旅程图。</p>
+        </div>
+      </div>
+      <div class="project reveal">
+        <div class="project-mark">⚙️</div>
+        <div class="project-body">
+          <div class="kicker">Case Study — Skill 定制</div>
+          <h3>个性化写作 Skill</h3>
+          <span class="tag">Skill 定制</span><span class="tag">个人风格</span>
+          <p>基于开源 Skill 迭代出适配个人风格的 AI 产品经理专业写作技能。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 文章 ===================== -->
+<section id="writing">
+  <div class="container">
+    <div class="section-head reveal">
+      <h2 class="stamp"><span class="idx">04</span> 文章与思考</h2>
+      <p>关于 AI 产品、拆解方法论与工作流的持续输出。</p>
+    </div>
+    <div class="posts">
+      <a class="post reveal" href="#">
+        <div>
+          <h3>产品拆解方法论：如何基于真实操作还原用户旅程</h3>
+          <div class="meta">方法论 · 8 分钟阅读</div>
+        </div>
+        <span class="arrow">→</span>
+      </a>
+      <a class="post reveal" href="#">
+        <div>
+          <h3>用 Agent 把「看懂产品」变成一套可复用的系统</h3>
+          <div class="meta">工作流 · 6 分钟阅读</div>
+        </div>
+        <span class="arrow">→</span>
+      </a>
+      <a class="post reveal" href="#">
+        <div>
+          <h3>提示词工程：为 AI 产品经理量身定制写作 Skill</h3>
+          <div class="meta">提示词 · 5 分钟阅读</div>
+        </div>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 工具栈 ===================== -->
+<section id="stack">
+  <div class="container">
+    <div class="section-head reveal">
+      <h2 class="stamp"><span class="idx">05</span> 常用工具</h2>
+    </div>
+    <div class="stack reveal">
+      <span class="chip">AI Agent</span>
+      <span class="chip">Codex</span>
+      <span class="chip">Dify</span>
+      <span class="chip">浏览器自动化</span>
+      <span class="chip">Obsidian</span>
+      <span class="chip">GitHub</span>
+      <span class="chip">飞书 / Lark</span>
+      <span class="chip">提示词工程</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 联系 ===================== -->
+<section id="contact">
+  <div class="container">
+    <div class="contact-card reveal">
+      <h2 class="stamp">一起聊聊 AI 产品</h2>
+      <p>如果你对产品拆解、Agent 工作流或 AI 产品感兴趣，欢迎来找我交流。</p>
+      <div class="contact-links">
+        <!-- CONTACT：替换为真实邮箱 / 微信 / 社交链接 -->
+        <a class="primary" href="mailto:you@example.com">发邮件 →</a>
+        <a href="#">微信</a>
+        <a href="https://github.com/fengxinbo558" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 页脚 ===================== -->
+<footer>
+  <div class="container footer-inner">
+    <div class="stamp-line">冯新波 · AI 产品经理</div>
+    <div class="coord"><b>fengxinbo558</b> · github · © 2025</div>
+  </div>
+</footer>
+
+
+</body>
+</html>
