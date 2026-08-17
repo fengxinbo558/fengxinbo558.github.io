@@ -6,848 +6,332 @@
 <title>冯新波 · AI产品经理</title>
 <meta name="description" content="冯新波，AI产品经理。专注 AI 产品拆解、用户旅程分析与 Agent 工作流设计。" />
 
-<!-- 设计规范：Dala — constellation floating on black velvet
-     字体回退：PPNeueMontreal → Inter（正文 200 / 标题 400） -->
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;600&display=swap" rel="stylesheet" />
-<!-- OGL：WebGL 渲染库（波纹扭曲效果用） -->
-<script src="https://cdn.jsdelivr.net/npm/ogl/dist/ogl.umd.js"></script>
-
 <style>
   :root {
-    /* —— 色彩 —— */
-    --void: #000000;        /* 纯黑画布 */
-    --iris: #8052ff;        /* Electric Iris —— 唯一按钮色 */
-    --saffron: #ffb829;     /* Saffron Spark —— 强调/链接 */
-    --verdant: #15846e;     /* Deep Verdant —— 次级表面/渐变深端 */
-    --ash: #9a9a9a;         /* 弱化导航文字 */
-    --mist: #bdbdbd;        /* 三级正文 */
-    --white: #ffffff;       /* 标题/正文/图标 */
-
-    --r: 24px;              /* 统一圆角 */
-    --max-w: 1280px;
-    --section-gap: 120px;
-
-    --font: "Inter", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    --bg: #fdfdfd;         /* 米白底 */
+    --bg-soft: #f6f6f3;    /* 浅暖灰 */
+    --bg-soft-2: #efeeea;  /* 更浅暖灰 */
+    --ink: #222222;        /* 主文字 */
+    --ink-soft: #444444;   /* 次级文字 */
+    --ink-mute: #777777;   /* 弱文字 */
+    --ink-faint: #999999;  /* 更弱文字 */
+    --rule: #e6e4dd;       /* 分隔线 */
+    --accent: #d26911;     /* 橙色点缀 */
+    --accent-hover: #b35309;
+    --max: 1080px;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { scroll-behavior: smooth; }
 
   body {
-    font-family: var(--font);
-    font-weight: 200;                       /* Dala 签名：正文超细 */
-    background: var(--void);
-    color: var(--white);
-    line-height: 1.5;
+    font-family: -apple-system, "system-ui", "SF Pro Text", "PingFang SC",
+      "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.75;
     -webkit-font-smoothing: antialiased;
-    letter-spacing: 0.01em;
-    overflow-x: hidden;
   }
 
   a { color: inherit; text-decoration: none; }
+  a:hover { color: var(--accent); }
   ul { list-style: none; }
-  img { max-width: 100%; display: block; }
 
-  .container { max-width: var(--max-w); margin: 0 auto; padding: 0 48px; }
-  @media (max-width: 720px) { .container { padding: 0 24px; } }
+  .container { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
 
-  /* ---------- 滚动进度条 ---------- */
-  .progress {
-    position: fixed; top: 0; left: 0; height: 2px; width: 0; z-index: 100;
-    background: linear-gradient(90deg, var(--iris), var(--saffron));
-    transition: width .08s linear;
-  }
-
-  /* ---------- 光标光晕 ---------- */
-  .cursor-glow {
-    position: fixed; width: 480px; height: 480px; border-radius: 50%;
-    pointer-events: none; z-index: 1; opacity: 0;
-    background: radial-gradient(circle, rgba(128,82,255,.12), transparent 60%);
-    transform: translate(-50%, -50%);
-    mix-blend-mode: screen;
-    transition: opacity .4s;
-  }
-  .cursor-glow.on { opacity: 1; }
-
-  /* ---------- 导航 ---------- */
+  /* ---------- 顶栏 ---------- */
   header {
-    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-    z-index: 50; width: min(var(--max-w), calc(100% - 48px));
-    border-radius: var(--r);
-    transition: background .35s, backdrop-filter .35s;
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(253,253,253,.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--rule);
   }
-  header.scrolled {
-    background: rgba(0,0,0,.55);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-  }
-  .nav {
-    display: flex; align-items: center; justify-content: space-between;
-    height: 64px; padding: 0 28px;
-  }
-  .logo { font-weight: 400; font-size: 15px; letter-spacing: -0.01em; color: var(--white); }
-  .logo b { color: var(--iris); font-weight: 400; }
-  .nav-links { display: flex; gap: 36px; }
-  .nav-links a {
-    font-size: 13px; letter-spacing: 0.025em; text-transform: uppercase;
-    color: var(--ash); transition: color .3s; position: relative;
-  }
-  .nav-links a::after {
-    content: ""; position: absolute; left: 0; bottom: -6px; height: 1px; width: 0;
-    background: var(--saffron); transition: width .3s;
-  }
-  .nav-links a:hover, .nav-links a.active { color: var(--white); }
-  .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
-  .nav-cta {
-    padding: 10px 22px; border-radius: var(--r); color: #000;
-    background: var(--iris); font-weight: 400; font-size: 14px;
-    transition: background .3s, transform .3s;
-  }
-  .nav-cta:hover { background: #9a75ff; }
-  @media (max-width: 760px) { .nav-links { display: none; } }
+  .nav { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 20px; }
+  .brand { font-weight: 700; font-size: 16px; color: var(--ink); white-space: nowrap; }
+  .brand .tagline { font-weight: 400; color: var(--ink-mute); }
+  .nav-links { display: flex; gap: 26px; }
+  .nav-links a { font-size: 14px; color: var(--ink-soft); }
+  .nav-links a:hover { color: var(--accent); }
+  .nav-gh { font-size: 14px; color: var(--ink-soft); white-space: nowrap; }
+  .nav-gh:hover { color: var(--accent); }
+  @media (max-width: 680px) { .brand .tagline { display: none; } .nav-links { gap: 16px; } }
 
   /* ---------- Hero ---------- */
-  .hero {
-    position: relative; min-height: 100vh; min-height: 100svh; display: flex; align-items: center;
-    padding: 160px 0 100px; overflow: hidden;
-  }
-  .ripple { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .ripple canvas { position: absolute; inset: 0; display: block; }
-  .hero-overlay {
-    position: absolute; inset: 0; pointer-events: none; z-index: 1;
-    background: linear-gradient(180deg, rgba(0,0,0,.62), rgba(0,0,0,.28) 45%, rgba(0,0,0,.72));
-  }
-  .hero .container { position: relative; z-index: 2; }
+  .hero { padding: 72px 0 40px; }
+  .hero h1 { font-size: 40px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
+  .hero .sub { font-size: 17px; color: var(--ink-soft); margin-top: 10px; }
+  .hero .intro { font-size: 15px; color: var(--ink-mute); max-width: 620px; margin-top: 16px; }
+  .hero .intro a { color: var(--accent); }
 
-  .hero-label {
-    font-size: 12px; letter-spacing: 0.28em; text-transform: uppercase;
-    color: var(--ash); margin-bottom: 32px;
+  /* 统计卡片 */
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 36px; }
+  @media (max-width: 680px) { .cards { grid-template-columns: 1fr; } }
+  .card {
+    display: flex; align-items: flex-start; gap: 14px;
+    background: var(--bg-soft); border: 1px solid var(--rule); border-radius: 10px;
+    padding: 20px; transition: border-color .2s, transform .2s;
   }
-  .hero-label .iris { color: var(--iris); }
+  .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .card .num { font-size: 28px; font-weight: 800; color: var(--accent); line-height: 1.1; }
+  .card h3 { font-size: 16px; font-weight: 700; }
+  .card p { font-size: 13px; color: var(--ink-mute); margin-top: 2px; }
+  .card .arrow { margin-left: auto; color: var(--ink-faint); font-size: 18px; align-self: center; }
 
-  .hero-title {
-    font-weight: 400;
-    font-size: clamp(56px, 12vw, 150px);
-    line-height: 1.02; letter-spacing: -0.04em;
-    margin-bottom: 20px;
-  }
-  .hero-title .char {
-    display: inline-block; opacity: 0; transform: translateY(0.6em);
-    filter: blur(8px); animation: char-in .9s cubic-bezier(.2,.7,.2,1) forwards;
-  }
-  @keyframes char-in {
-    to { opacity: 1; transform: none; filter: blur(0); }
-  }
+  /* ---------- 两栏布局 ---------- */
+  .layout { display: grid; grid-template-columns: 1fr 300px; gap: 48px; padding: 40px 0 64px; }
+  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
 
-  .hero-sub {
-    font-size: clamp(20px, 3vw, 30px); font-weight: 400; letter-spacing: -0.01em;
-    margin-bottom: 28px;
-  }
-  .hero-sub .amber { color: var(--saffron); }
+  /* 主栏 section */
+  .main section { margin-bottom: 56px; }
+  .sec-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 20px; }
+  .sec-head h2 { font-size: 20px; font-weight: 700; }
+  .sec-head .all { font-size: 13px; color: var(--ink-mute); }
+  .sec-head .all:hover { color: var(--accent); }
 
-  .hero-lead {
-    font-size: 18px; font-weight: 200; color: var(--mist);
-    max-width: 540px; margin-bottom: 48px;
-  }
+  /* 项目列表 */
+  .project-item { padding: 22px 0; border-top: 1px solid var(--rule); }
+  .project-item:last-child { border-bottom: 1px solid var(--rule); }
+  .project-item .meta { font-size: 12px; color: var(--ink-faint); letter-spacing: .02em; margin-bottom: 6px; }
+  .project-item h3 { font-size: 18px; font-weight: 700; }
+  .project-item h3 a:hover { color: var(--accent); }
+  .project-item .tags { margin-top: 6px; }
+  .project-item .tag { display: inline-block; font-size: 12px; color: var(--accent); background: var(--bg-soft); border-radius: 4px; padding: 2px 8px; margin-right: 6px; }
+  .project-item p { font-size: 14px; color: var(--ink-mute); margin-top: 8px; max-width: 640px; }
 
-  .hero-actions { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
-  .btn-primary {
-    display: inline-block; padding: 16px 34px; border-radius: var(--r);
-    background: var(--iris); color: #000; font-weight: 400; font-size: 15px;
-    transition: background .3s, transform .15s;
-  }
-  .btn-primary:hover { background: #9a75ff; }
-  .link-amber {
-    font-size: 15px; font-weight: 400; color: var(--saffron); position: relative;
-  }
-  .link-amber::after {
-    content: " →"; display: inline-block; transition: transform .3s;
-  }
-  .link-amber:hover::after { transform: translateX(5px); }
+  /* 博客列表 */
+  .post-item { padding: 22px 0; border-top: 1px solid var(--rule); }
+  .post-item:last-child { border-bottom: 1px solid var(--rule); }
+  .post-item h3 { font-size: 17px; font-weight: 700; }
+  .post-item h3 a:hover { color: var(--accent); }
+  .post-item .meta { font-size: 13px; color: var(--ink-faint); margin-top: 4px; }
+  .post-item .meta .cat { color: var(--accent); }
+  .post-item p { font-size: 14px; color: var(--ink-mute); margin-top: 8px; }
+  .post-item .more { font-size: 13px; color: var(--ink-soft); margin-top: 6px; display: inline-block; }
+  .post-item .more:hover { color: var(--accent); }
 
-  .hero-stats {
-    margin-top: 80px; display: flex; gap: 64px; flex-wrap: wrap;
+  /* ---------- 侧栏 ---------- */
+  .sidebar section { margin-bottom: 36px; }
+  .sidebar h2 { font-size: 15px; font-weight: 700; margin-bottom: 14px; color: var(--ink); }
+  .sidebar .about-me { display: flex; gap: 14px; align-items: flex-start; }
+  .avatar {
+    width: 52px; height: 52px; border-radius: 50%; flex-shrink: 0;
+    background: var(--bg-soft-2); color: var(--accent);
+    display: grid; place-items: center; font-size: 22px; font-weight: 700;
   }
-  .stat b {
-    display: block; font-size: 44px; font-weight: 200; letter-spacing: -0.03em;
-    color: var(--white); font-variant-numeric: tabular-nums;
-  }
-  .stat b .unit { color: var(--iris); }
-  .stat span {
-    font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ash);
-  }
+  .sidebar .about-me p { font-size: 13.5px; color: var(--ink-soft); }
+  .sidebar .about-me p + p { margin-top: 6px; }
+  .sidebar .about-me .name { font-weight: 700; color: var(--ink); font-size: 15px; }
+  .sidebar .about-me a { color: var(--accent); }
 
-  /* ---------- 通用 section ---------- */
-  section { padding: var(--section-gap) 0; }
-  @media (max-width: 720px) { section { padding: 80px 0; } }
+  /* 能力列表 */
+  .skill-list li { padding: 8px 0; border-top: 1px solid var(--rule); font-size: 14px; color: var(--ink-soft); }
+  .skill-list li:first-child { border-top: none; }
+  .skill-list li b { font-weight: 600; color: var(--ink); }
 
-  .section-head { margin-bottom: 64px; }
-  .eyebrow {
-    font-size: 12px; letter-spacing: 0.24em; text-transform: uppercase;
-    color: var(--ash); margin-bottom: 20px; display: block;
-  }
-  .eyebrow .amber { color: var(--saffron); }
-  .section-head h2 {
-    font-weight: 400; letter-spacing: -0.04em; line-height: 1.05;
-    font-size: clamp(40px, 7vw, 78px);
-  }
-  .section-head p { color: var(--mist); margin-top: 20px; max-width: 560px; font-size: 18px; font-weight: 200; }
+  /* 分类 */
+  .cat-list li { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; }
+  .cat-list li a { color: var(--ink-soft); }
+  .cat-list li a:hover { color: var(--accent); }
+  .cat-list li .count { color: var(--ink-faint); }
 
-  /* ---------- 关于（漂浮文本，无卡片）---------- */
-  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
-  @media (max-width: 820px) { .about-grid { grid-template-columns: 1fr; } }
-  .about-grid p { font-size: 20px; font-weight: 200; color: var(--mist); line-height: 1.7; }
-  .about-grid p + p { margin-top: 28px; }
-  .about-grid .w { color: var(--white); font-weight: 400; }
-  .about-grid .a { color: var(--saffron); }
-
-  /* ---------- 能力 ---------- */
-  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 56px 40px; }
-  @media (max-width: 900px) { .grid-3 { grid-template-columns: 1fr 1fr; } }
-  @media (max-width: 560px) { .grid-3 { grid-template-columns: 1fr; } }
-  .cell { position: relative; }
-  .cell .idx { display: block; font-size: 12px; letter-spacing: 0.14em; color: var(--iris); margin-bottom: 24px; }
-  .cell h3 { font-size: 24px; font-weight: 400; letter-spacing: -0.01em; margin-bottom: 12px; transition: transform .3s; }
-  .cell p { font-size: 15px; font-weight: 200; color: var(--mist); }
-  .cell::before {
-    content: ""; position: absolute; left: -18px; top: 8px; width: 6px; height: 6px;
-    border-radius: 50%; background: var(--iris); opacity: 0;
-    transform: scale(0); transition: opacity .3s, transform .3s;
-  }
-  .cell:hover::before { opacity: 1; transform: scale(1); }
-  .cell:hover h3 { transform: translateX(6px); }
-
-  /* ---------- 项目 ---------- */
-  .projects { display: grid; }
-  .project {
-    display: grid; grid-template-columns: 72px 1fr auto; gap: 28px; align-items: baseline;
-    padding: 40px 0; border-bottom: 1px solid rgba(255,255,255,.08);
-    transition: padding-left .35s; position: relative;
-  }
-  .project:first-child { border-top: 1px solid rgba(255,255,255,.08); }
-  .project .num { font-size: 13px; letter-spacing: 0.1em; color: var(--ash); font-weight: 400; }
-  .project .kicker { font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ash); margin-bottom: 10px; }
-  .project h3 { font-size: clamp(24px, 3.4vw, 38px); font-weight: 400; letter-spacing: -0.02em; transition: color .3s; }
-  .project .tags { margin-top: 14px; }
-  .project .tag { font-size: 12px; color: var(--iris); margin-right: 16px; }
-  .project .desc { margin-top: 12px; font-size: 15px; font-weight: 200; color: var(--mist); max-width: 560px; }
-  .project .arrow {
-    font-size: 28px; color: var(--saffron); align-self: center;
-    opacity: 0; transform: translateX(-12px); transition: opacity .35s, transform .35s;
-  }
-  .project:hover { padding-left: 16px; }
-  .project:hover h3 { color: var(--saffron); }
-  .project:hover .arrow { opacity: 1; transform: none; }
-  @media (max-width: 720px) { .project { grid-template-columns: 1fr; gap: 8px; } .project .arrow { display: none; } }
-
-  /* ---------- 文章 ---------- */
-  .posts { display: grid; }
-  .post {
-    display: flex; justify-content: space-between; align-items: center; gap: 20px;
-    padding: 32px 0; border-bottom: 1px solid rgba(255,255,255,.08);
-    transition: padding-left .35s;
-  }
-  .post:first-child { border-top: 1px solid rgba(255,255,255,.08); }
-  .post h3 { font-size: 22px; font-weight: 400; letter-spacing: -0.01em; transition: color .3s; }
-  .post .meta { font-size: 12px; letter-spacing: 0.08em; color: var(--ash); margin-top: 8px; }
-  .post .arrow { font-size: 20px; color: var(--saffron); opacity: 0; transform: translateX(-10px); transition: opacity .3s, transform .3s; }
-  .post:hover { padding-left: 12px; }
-  .post:hover h3 { color: var(--saffron); }
-  .post:hover .arrow { opacity: 1; transform: none; }
-
-  /* ---------- 工具栈 ---------- */
-  .stack { display: flex; flex-wrap: wrap; gap: 14px; }
-  .chip {
-    padding: 12px 22px; border-radius: var(--r); font-size: 14px; font-weight: 200;
-    color: var(--mist); transition: color .3s, transform .3s;
-  }
-  .chip:hover { color: var(--white); transform: translateY(-3px); }
-
-  /* ---------- 联系 ---------- */
-  .contact { text-align: left; }
-  .contact h2 {
-    font-weight: 400; letter-spacing: -0.04em; line-height: 1.05;
-    font-size: clamp(44px, 8vw, 96px); margin-bottom: 28px;
-  }
-  .contact h2 .amber { color: var(--saffron); }
-  .contact p { font-size: 18px; font-weight: 200; color: var(--mist); max-width: 480px; margin-bottom: 44px; }
-  .contact-actions { display: flex; gap: 18px; flex-wrap: wrap; align-items: center; }
-  .contact-actions .link-amber { font-size: 16px; }
+  /* 联系 */
+  .contact-list li { padding: 6px 0; font-size: 14px; }
+  .contact-list a { color: var(--ink-soft); }
+  .contact-list a:hover { color: var(--accent); }
 
   /* ---------- 页脚 ---------- */
-  footer { padding: 48px 0; }
-  .footer-inner { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; font-size: 13px; color: var(--ash); }
-  .footer-inner b { color: var(--mist); font-weight: 400; }
-
-  /* ---------- 揭示动画（默认可见，JS 才隐藏）---------- */
-  [data-reveal] { opacity: 1; transform: none; }
-  .js [data-reveal] { opacity: 0; }
-  .js [data-reveal="up"]    { transform: translateY(40px); }
-  .js [data-reveal="left"]  { transform: translateX(-40px); }
-  .js [data-reveal="right"] { transform: translateX(40px); }
-  .js [data-reveal="scale"] { transform: scale(.94); }
-  .js [data-reveal].revealed { opacity: 1; transform: none; transition: opacity .8s cubic-bezier(.2,.7,.2,1), transform .8s cubic-bezier(.2,.7,.2,1); }
-
-  @media (prefers-reduced-motion: reduce) {
-    .js [data-reveal] { opacity: 1 !important; transform: none !important; }
-    .hero-title .char { opacity: 1 !important; transform: none !important; filter: none !important; animation: none !important; }
-  }
+  footer { border-top: 1px solid var(--rule); padding: 32px 0; }
+  .footer-inner { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--ink-faint); }
+  .footer-inner .links { display: flex; gap: 16px; }
+  .footer-inner .links a { color: var(--ink-mute); }
+  .footer-inner .links a:hover { color: var(--accent); }
 </style>
 </head>
 <body>
 
-<div class="progress" id="progress"></div>
-<div class="cursor-glow" id="cursorGlow"></div>
-
-<!-- ===================== 导航 ===================== -->
-<header id="header">
-  <div class="nav">
-    <div class="logo">fengxinbo<b>.</b>me</div>
+<!-- ===================== 顶栏 ===================== -->
+<header>
+  <div class="container nav">
+    <a class="brand" href="#top">冯新波 <span class="tagline">· AI产品经理</span></a>
     <nav class="nav-links">
       <a href="#about">背景</a>
-      <a href="#skills">能力</a>
       <a href="#projects">项目</a>
-      <a href="#writing">博客</a>
+      <a href="#blog">博客</a>
     </nav>
-    <a class="nav-cta" href="#contact">联系我</a>
+    <a class="nav-gh" href="https://github.com/fengxinbo558" target="_blank" rel="noopener">GitHub ↗</a>
   </div>
 </header>
 
-<!-- ===================== HERO ===================== -->
-<div class="hero" id="hero">
-  <div class="ripple" id="ripple"></div>
-  <div class="hero-overlay"></div>
-  <div class="container">
-    <p class="hero-label" data-reveal="up">AI PRODUCT MANAGER <span class="iris">/</span> 个人主页</p>
-    <h1 class="hero-title" id="heroTitle">冯新波</h1>
-    <p class="hero-sub" data-reveal="up" data-delay="120">AI产品经理 <span class="amber">·</span> 产品拆解研究者</p>
-    <p class="hero-lead" data-reveal="up" data-delay="200">
-      专注 AI 产品的深度拆解与用户旅程分析，从真实操作中还原产品逻辑，
-      并把洞察沉淀为可复用的 Agent 工作流与提示词体系。
+<main class="container" id="top">
+
+  <!-- ===================== Hero ===================== -->
+  <section class="hero">
+    <h1>冯新波</h1>
+    <p class="sub">AI产品经理 · 专注 AI 产品拆解与用户旅程分析</p>
+    <p class="intro">
+      从真实操作中还原产品逻辑，把洞察沉淀为可复用的 Agent 工作流与提示词体系。
+      <a href="#about">了解更多 →</a>
     </p>
-    <div class="hero-actions" data-reveal="up" data-delay="280">
-      <a class="btn-primary" data-magnetic href="#projects">查看拆解案例</a>
-      <a class="link-amber" href="#contact">与我联系</a>
-    </div>
-    <div class="hero-stats" data-reveal="up" data-delay="360">
-      <div class="stat"><b><span data-count="10">0</span><span class="unit">+</span></b><span>深度产品拆解</span></div>
-      <div class="stat"><b><span data-count="4" data-pad>0</span></b><span>核心研究项目</span></div>
-      <div class="stat"><b><span data-count="1" data-pad>0</span></b><span>Agent 工作流体系</span></div>
-      <div class="stat"><b>∞</b><span>对 AI 的好奇心</span></div>
-    </div>
-  </div>
-</div>
 
-<!-- ===================== 关于 ===================== -->
-<section id="about">
-  <div class="container">
-    <div class="section-head" data-reveal="up">
-      <span class="eyebrow"><span class="amber">01</span> — 个人背景</span>
-      <h2>AI 产品经理<br />用证据看懂产品</h2>
+    <div class="cards">
+      <a class="card" href="#projects">
+        <span class="num">04</span>
+        <div><h3>项目</h3><p>AI 产品拆解案例</p></div>
+        <span class="arrow">→</span>
+      </a>
+      <a class="card" href="#blog">
+        <span class="num">03</span>
+        <div><h3>博客</h3><p>文章与思考 · 持续输出</p></div>
+        <span class="arrow">→</span>
+      </a>
+      <a class="card" href="#about">
+        <span class="num">10+</span>
+        <div><h3>拆解</h3><p>深度产品拆解</p></div>
+        <span class="arrow">→</span>
+      </a>
     </div>
-    <div class="about-grid">
-      <p data-reveal="up">我是一名 <span class="w">AI产品经理</span>，日常与 AI Agent、提示词工程、自动化工作流打交道，关注大模型能力如何真正落地为产品价值。</p>
-      <p data-reveal="up" data-delay="80">我特别着迷于「<span class="a">产品拆解</span>」这件事：不是看宣传页，而是打开产品、逐条浏览真实操作记录，梳理出从输入需求到最终产出的完整用户旅程，再判断哪些体验是好的、哪些是断裂的。</p>
-    </div>
-  </div>
-</section>
+  </section>
 
-<!-- ===================== 能力 ===================== -->
-<section id="skills">
-  <div class="container">
-    <div class="section-head" data-reveal="up">
-      <span class="eyebrow"><span class="amber">02</span> — 我的能力</span>
-      <h2>从拆解到沉淀</h2>
-    </div>
-    <div class="grid-3">
-      <div class="cell" data-reveal="up"><span class="idx">01</span><h3>AI 产品拆解</h3><p>基于真实页面操作，逐条取证，还原产品逻辑与关键决策点。</p></div>
-      <div class="cell" data-reveal="up" data-delay="60"><span class="idx">02</span><h3>用户旅程图</h3><p>从输入需求到最终产出，梳理完整流程、分支与纠偏路径。</p></div>
-      <div class="cell" data-reveal="up" data-delay="120"><span class="idx">03</span><h3>Agent 工作流设计</h3><p>把重复的分析动作编排成自动化 Agent，让洞察可复制、可扩展。</p></div>
-      <div class="cell" data-reveal="up"><span class="idx">04</span><h3>提示词工程</h3><p>设计高质量提示词与 Skill，面向 AI 产品经理的专业内容创作。</p></div>
-      <div class="cell" data-reveal="up" data-delay="60"><span class="idx">05</span><h3>证据驱动分析</h3><p>区分「页面事实 / 合理推断 / 尚未确认」，拒绝脑补式结论。</p></div>
-      <div class="cell" data-reveal="up" data-delay="120"><span class="idx">06</span><h3>知识库沉淀</h3><p>用 Obsidian 等工具把拆解成果结构化，形成可持续迭代的知识体系。</p></div>
-    </div>
-  </div>
-</section>
+  <!-- ===================== 两栏 ===================== -->
+  <div class="layout">
 
-<!-- ===================== 项目 ===================== -->
-<section id="projects">
-  <div class="container">
-    <div class="section-head" data-reveal="up">
-      <span class="eyebrow"><span class="amber">03</span> — 项目</span>
-      <h2>每一个都是打开产品<br />基于真实操作完成的拆解</h2>
-    </div>
-    <div class="projects">
-      <a class="project" href="#" data-reveal="up">
-        <div class="num">01</div>
-        <div>
-          <div class="kicker">Case Study — 视频生成</div>
-          <h3>OiiOii · AI 视频生成产品拆解</h3>
+    <!-- ---------- 主栏 ---------- -->
+    <div class="main">
+
+      <!-- 项目 -->
+      <section id="projects">
+        <div class="sec-head">
+          <h2>项目</h2>
+          <span class="all">AI 产品拆解案例</span>
+        </div>
+
+        <div class="project-item">
+          <div class="meta">CASE STUDY — 视频生成</div>
+          <h3><a href="#">OiiOii · AI 视频生成产品拆解</a></h3>
           <div class="tags"><span class="tag">用户旅程图</span><span class="tag">视频生成</span></div>
-          <p class="desc">从输入需求到产出视频的完整旅程，覆盖角色 / 场景 / 道具 / 分镜与纠偏路径。</p>
+          <p>从输入需求到产出视频的完整旅程，覆盖角色 / 场景 / 道具 / 分镜与纠偏路径。</p>
         </div>
-        <span class="arrow">→</span>
-      </a>
-      <a class="project" href="#" data-reveal="up">
-        <div class="num">02</div>
-        <div>
-          <div class="kicker">Case Study — 四阶段框架</div>
-          <h3>Mindtrip.ai · 四阶段产品拆解</h3>
+
+        <div class="project-item">
+          <div class="meta">CASE STUDY — 四阶段框架</div>
+          <h3><a href="#">Mindtrip.ai · 四阶段产品拆解</a></h3>
           <div class="tags"><span class="tag">四阶段框架</span><span class="tag">提示词</span></div>
-          <p class="desc">四阶段深度拆解提示词体系，系统化梳理产品从触达到转化的完整逻辑。</p>
+          <p>四阶段深度拆解提示词体系，系统化梳理产品从触达到转化的完整逻辑。</p>
         </div>
-        <span class="arrow">→</span>
-      </a>
-      <a class="project" href="#" data-reveal="up">
-        <div class="num">03</div>
-        <div>
-          <div class="kicker">Case Study — 旅行规划</div>
-          <h3>Wanderlog · 旅行规划产品拆解</h3>
+
+        <div class="project-item">
+          <div class="meta">CASE STUDY — 旅行规划</div>
+          <h3><a href="#">Wanderlog · 旅行规划产品拆解</a></h3>
           <div class="tags"><span class="tag">用户旅程图</span><span class="tag">旅行规划</span></div>
-          <p class="desc">拆解旅行规划产品的用户旅程，产出结构化分析报告与可视化旅程图。</p>
+          <p>拆解旅行规划产品的用户旅程，产出结构化分析报告与可视化旅程图。</p>
         </div>
-        <span class="arrow">→</span>
-      </a>
-      <a class="project" href="#" data-reveal="up">
-        <div class="num">04</div>
-        <div>
-          <div class="kicker">Case Study — Skill 定制</div>
-          <h3>个性化写作 Skill</h3>
+
+        <div class="project-item">
+          <div class="meta">CASE STUDY — Skill 定制</div>
+          <h3><a href="#">个性化写作 Skill</a></h3>
           <div class="tags"><span class="tag">Skill 定制</span><span class="tag">个人风格</span></div>
-          <p class="desc">基于开源 Skill 迭代出适配个人风格的 AI 产品经理专业写作技能。</p>
+          <p>基于开源 Skill 迭代出适配个人风格的 AI 产品经理专业写作技能。</p>
         </div>
-        <span class="arrow">→</span>
-      </a>
-    </div>
-  </div>
-</section>
+      </section>
 
-<!-- ===================== 文章 ===================== -->
-<section id="writing">
-  <div class="container">
-    <div class="section-head" data-reveal="up">
-      <span class="eyebrow"><span class="amber">04</span> — 博客</span>
-      <h2>文章与思考</h2>
-    </div>
-    <div class="posts">
-      <a class="post" href="#" data-reveal="up">
-        <div><h3>产品拆解方法论：如何基于真实操作还原用户旅程</h3><div class="meta">方法论 · 8 分钟阅读</div></div>
-        <span class="arrow">→</span>
-      </a>
-      <a class="post" href="#" data-reveal="up">
-        <div><h3>用 Agent 把「看懂产品」变成一套可复用的系统</h3><div class="meta">工作流 · 6 分钟阅读</div></div>
-        <span class="arrow">→</span>
-      </a>
-      <a class="post" href="#" data-reveal="up">
-        <div><h3>提示词工程：为 AI 产品经理量身定制写作 Skill</h3><div class="meta">提示词 · 5 分钟阅读</div></div>
-        <span class="arrow">→</span>
-      </a>
-    </div>
-  </div>
-</section>
+      <!-- 博客 -->
+      <section id="blog">
+        <div class="sec-head">
+          <h2>最近在写</h2>
+          <a class="all" href="#blog">全部 →</a>
+        </div>
 
-<!-- ===================== 联系 ===================== -->
-<section id="contact">
-  <div class="container">
-    <div class="contact">
-      <h2 data-reveal="up">一起聊聊<br /><span class="amber">AI 产品</span></h2>
-      <p data-reveal="up" data-delay="80">如果你对产品拆解、Agent 工作流或 AI 产品感兴趣，欢迎来找我交流。</p>
-      <div class="contact-actions" data-reveal="up" data-delay="160">
-        <!-- CONTACT：替换为真实邮箱 / 微信 / 社交链接 -->
-        <a class="btn-primary" data-magnetic href="mailto:you@example.com">发邮件</a>
-        <a class="link-amber" href="#">微信</a>
-        <a class="link-amber" href="https://github.com/fengxinbo558" target="_blank" rel="noopener">GitHub</a>
-      </div>
+        <div class="post-item">
+          <h3><a href="#">产品拆解方法论：如何基于真实操作还原用户旅程</a></h3>
+          <div class="meta">2026-08-16 · <span class="cat">方法论</span></div>
+          <p>不是看宣传页，而是打开产品、逐条浏览真实操作记录，梳理从输入需求到最终产出的完整用户旅程。</p>
+          <a class="more" href="#">继续读 →</a>
+        </div>
+
+        <div class="post-item">
+          <h3><a href="#">用 Agent 把「看懂产品」变成一套可复用的系统</a></h3>
+          <div class="meta">2026-08-09 · <span class="cat">工作流</span></div>
+          <p>把重复的分析动作编排成自动化 Agent，让「看懂一个产品」变成可持续运转的系统。</p>
+          <a class="more" href="#">继续读 →</a>
+        </div>
+
+        <div class="post-item">
+          <h3><a href="#">提示词工程：为 AI 产品经理量身定制写作 Skill</a></h3>
+          <div class="meta">2026-08-02 · <span class="cat">提示词</span></div>
+          <p>设计高质量提示词与 Skill，面向 AI 产品经理的专业内容创作与个人风格沉淀。</p>
+          <a class="more" href="#">继续读 →</a>
+        </div>
+      </section>
     </div>
+
+    <!-- ---------- 侧栏 ---------- -->
+    <aside class="sidebar">
+
+      <!-- 个人背景 -->
+      <section id="about">
+        <h2>关于我</h2>
+        <div class="about-me">
+          <div class="avatar">冯</div>
+          <div>
+            <p class="name">冯新波</p>
+            <p>AI产品经理，<a href="https://github.com/fengxinbo558" target="_blank" rel="noopener">GitHub</a></p>
+            <p>专注 AI 产品拆解与用户旅程分析，坚持「证据优先」——页面事实、合理推断、尚未确认，拒绝脑补式结论。</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 能力 · 从拆解到沉淀 -->
+      <section>
+        <h2>能力 · 从拆解到沉淀</h2>
+        <ul class="skill-list">
+          <li><b>AI 产品拆解</b> — 逐条取证，还原产品逻辑</li>
+          <li><b>用户旅程图</b> — 梳理流程、分支与纠偏</li>
+          <li><b>Agent 工作流</b> — 洞察可复制、可扩展</li>
+          <li><b>提示词工程</b> — 面向专业内容创作</li>
+          <li><b>证据驱动分析</b> — 拒绝脑补式结论</li>
+          <li><b>知识库沉淀</b> — 可持续迭代的体系</li>
+        </ul>
+      </section>
+
+      <!-- 分类 -->
+      <section>
+        <h2>分类</h2>
+        <ul class="cat-list">
+          <li><a href="#blog">产品拆解</a><span class="count">4</span></li>
+          <li><a href="#blog">用户旅程</a><span class="count">3</span></li>
+          <li><a href="#blog">Agent 工作流</a><span class="count">2</span></li>
+          <li><a href="#blog">提示词工程</a><span class="count">2</span></li>
+          <li><a href="#blog">思考</a><span class="count">1</span></li>
+        </ul>
+      </section>
+
+      <!-- 联系 -->
+      <section>
+        <h2>联系</h2>
+        <ul class="contact-list">
+          <!-- CONTACT：替换为真实邮箱 / 微信 -->
+          <li><a href="mailto:you@example.com">📧 邮箱</a></li>
+          <li><a href="#">💬 微信</a></li>
+          <li><a href="https://github.com/fengxinbo558" target="_blank" rel="noopener">🐙 GitHub</a></li>
+        </ul>
+      </section>
+    </aside>
   </div>
-</section>
+</main>
 
 <!-- ===================== 页脚 ===================== -->
 <footer>
   <div class="container footer-inner">
-    <div>冯新波 · AI 产品经理</div>
-    <div><b>fengxinbo558</b> · github · © 2025</div>
+    <div>© 2026 冯新波 · AI产品经理</div>
+    <div class="links">
+      <a href="https://github.com/fengxinbo558" target="_blank" rel="noopener">GitHub</a>
+      <a href="#about">关于</a>
+      <a href="#blog">博客</a>
+    </div>
   </div>
 </footer>
-
-<script>
-(function () {
-  var d = document;
-  d.documentElement.classList.add('js');
-
-  /* ============ 1. 英雄标题逐字入场 ============ */
-  var title = d.getElementById('heroTitle');
-  var text = title.textContent;
-  title.innerHTML = '';
-  [].forEach.call(text, function (ch, i) {
-    var s = d.createElement('span');
-    s.className = 'char';
-    s.style.animationDelay = (i * 90 + 100) + 'ms';
-    s.textContent = ch;
-    title.appendChild(s);
-  });
-
-  /* ============ 2. 波纹扭曲（WebGL 鼠标联动） ============ */
-  // 效果：灰度图片 + 鼠标划过产生的涟漪波纹 + 紫色染色 + 漩涡扭曲
-  var rippleEl = d.getElementById('ripple');
-  var HERO_IMG = 'https://images.unsplash.com/photo-1782977389500-dd7adad33ebe?q=80&w=2000&auto=format&fit=crop'; // ← 想换图，改这里的网址
-  if (rippleEl && window.ogl) {
-    try {
-      var MAX_WAVES = 100;
-      var QUALITY_SCALE = { low: 0.4, medium: 0.7, high: 1 };
-      var START_SCALE = 1.5;
-      var LIFE_CONSTANT = Math.log(500);
-
-      var waveVertex = `
-precision highp float;
-attribute vec2 position;
-attribute vec2 uv;
-attribute vec2 iOffset;
-attribute vec2 iScale;
-attribute float iOpacity;
-varying vec2 vUv;
-varying float vOpacity;
-void main() {
-  vUv = uv;
-  vOpacity = iOpacity;
-  gl_Position = vec4(iOffset + position * iScale, 0.0, 1.0);
-}`;
-
-      var waveFragment = `
-precision highp float;
-varying vec2 vUv;
-varying float vOpacity;
-uniform float uRings;
-const float PI = 3.141592653589793;
-const float EDGE = 0.006737947;
-void main() {
-  vec2 p = vUv * 2.0 - 1.0;
-  float r = dot(p, p);
-  if (r > 1.0) discard;
-  float brush = (exp(-r * 5.0) - EDGE) / (1.0 - EDGE);
-  brush *= 0.55 + 0.45 * cos(sqrt(r) * PI * 2.0 * uRings);
-  gl_FragColor = vec4(vec3(brush * vOpacity * vOpacity), 1.0);
-}`;
-
-      var screenVertex = `
-precision highp float;
-attribute vec2 position;
-attribute vec2 uv;
-varying vec2 vUv;
-void main() {
-  vUv = uv;
-  gl_Position = vec4(position, 0.0, 1.0);
-}`;
-
-      var compositeFragment = `
-precision highp float;
-varying vec2 vUv;
-uniform sampler2D uTexture;
-uniform sampler2D uDisplacement;
-uniform vec2 uResolution;
-uniform vec2 uTextureSize;
-uniform vec2 uTexel;
-uniform vec3 uTint;
-uniform vec3 uHighlight;
-uniform float uStrength;
-uniform float uSwirl;
-uniform float uDispersion;
-uniform float uGlint;
-uniform float uTintAmount;
-uniform float uGrayscale;
-const float TAU = 6.283185307179586;
-vec2 coverUV(vec2 uv) {
-  vec2 safe = max(uTextureSize, vec2(1.0));
-  vec2 s = uResolution / safe;
-  vec2 scaledSize = safe * max(s.x, s.y);
-  vec2 offset = (uResolution - scaledSize) * 0.5;
-  return (uv * uResolution - offset) / scaledSize;
-}
-void main() {
-  float amount = texture2D(uDisplacement, vUv).r;
-  vec2 base = coverUV(vUv);
-  float theta = amount * uSwirl * TAU;
-  vec2 dir = vec2(sin(theta), cos(theta));
-  vec2 push = dir * amount * uStrength;
-  vec3 color;
-  if (uDispersion > 0.001) {
-    float split = uDispersion * 0.25;
-    color.r = texture2D(uTexture, base + push * (1.0 + split)).r;
-    color.g = texture2D(uTexture, base + push).g;
-    color.b = texture2D(uTexture, base + push * (1.0 - split)).b;
-  } else {
-    color = texture2D(uTexture, base + push).rgb;
-  }
-  if (uGrayscale > 0.001) {
-    color = mix(color, vec3(dot(color, vec3(0.2126, 0.7152, 0.0722))), uGrayscale);
-  }
-  if (uTintAmount > 0.001) {
-    color = mix(color, color * uTint * 1.9, clamp(amount * 1.6, 0.0, 1.0) * uTintAmount);
-  }
-  if (uGlint > 0.001) {
-    float ex = texture2D(uDisplacement, vUv + vec2(uTexel.x, 0.0)).r - texture2D(uDisplacement, vUv - vec2(uTexel.x, 0.0)).r;
-    float ey = texture2D(uDisplacement, vUv + vec2(0.0, uTexel.y)).r - texture2D(uDisplacement, vUv - vec2(0.0, uTexel.y)).r;
-    vec3 normal = normalize(vec3(-ex * 26.0, -ey * 26.0, 1.0));
-    vec3 light = normalize(vec3(-0.35, 0.55, 1.0));
-    float raw = pow(max(dot(normal, light), 0.0), 22.0);
-    float flatSpec = pow(max(light.z, 0.0), 22.0);
-    color += uHighlight * clamp((raw - flatSpec) / max(1.0 - flatSpec, 0.0001), 0.0, 1.0) * uGlint;
-  }
-  gl_FragColor = vec4(color, 1.0);
-}`;
-
-      function hexRGB(hex) {
-        var c = hex.replace('#', '');
-        if (c.length === 3) c = c.split('').map(function (x) { return x + x; }).join('');
-        var n = parseInt(c, 16);
-        if (isNaN(n)) return [1, 1, 1];
-        return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
-      }
-
-      var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-      var renderer = new ogl.Renderer({ alpha: false, antialias: false, dpr: Math.min(window.devicePixelRatio || 1, 2) });
-      var gl = renderer.gl;
-      gl.clearColor(0, 0, 0, 1);
-      var canvas = gl.canvas;
-      canvas.style.width = '100%';
-      canvas.style.height = '100%';
-      canvas.style.display = 'block';
-      rippleEl.appendChild(canvas);
-
-      var imageTexture = new ogl.Texture(gl, { generateMipmaps: false, minFilter: gl.LINEAR, magFilter: gl.LINEAR, wrapS: gl.CLAMP_TO_EDGE, wrapT: gl.CLAMP_TO_EDGE });
-
-      var compositeUniforms = {
-        uTexture: { value: imageTexture },
-        uDisplacement: { value: null },
-        uResolution: { value: [1, 1] },
-        uTextureSize: { value: [1, 1] },
-        uTexel: { value: [1, 1] },
-        uTint: { value: hexRGB('#a855f7') },
-        uHighlight: { value: [1, 1, 1] },
-        uStrength: { value: 0.2 },
-        uSwirl: { value: 1 },
-        uDispersion: { value: 0 },
-        uGlint: { value: 0 },
-        uTintAmount: { value: 0.08 },
-        uGrayscale: { value: 1 }
-      };
-
-      var img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.decoding = 'async';
-      img.onload = function () {
-        imageTexture.image = img;
-        compositeUniforms.uTextureSize.value = [img.naturalWidth || 1, img.naturalHeight || 1];
-      };
-      img.src = HERO_IMG;
-
-      var offsets = new Float32Array(MAX_WAVES * 2);
-      var scales = new Float32Array(MAX_WAVES * 2);
-      var opacities = new Float32Array(MAX_WAVES);
-
-      var waves = [];
-      for (var wi = 0; wi < MAX_WAVES; wi++) {
-        waves.push({ x: 0, y: 0, scale: START_SCALE, target: START_SCALE, size: 1, opacity: 0 });
-      }
-      var current = 0;
-
-      var geometry = new ogl.Geometry(gl, {
-        position: { size: 2, data: new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]) },
-        uv: { size: 2, data: new Float32Array([0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1]) },
-        iOffset: { instanced: 1, size: 2, data: offsets },
-        iScale: { instanced: 1, size: 2, data: scales },
-        iOpacity: { instanced: 1, size: 1, data: opacities }
-      });
-
-      var waveUniforms = { uRings: { value: 4 } };
-      var waveProgram = new ogl.Program(gl, { vertex: waveVertex, fragment: waveFragment, uniforms: waveUniforms, transparent: true, depthTest: false, depthWrite: false, cullFace: false });
-      waveProgram.setBlendFunc(gl.ONE, gl.ONE);
-      var waveMesh = new ogl.Mesh(gl, { geometry: geometry, program: waveProgram, frustumCulled: false });
-
-      var DISP = 512;   // 位移场分辨率（固定，无需随画布缩放）
-      var displacementTarget = new ogl.RenderTarget(gl, { width: DISP, height: DISP, depth: false, minFilter: gl.LINEAR, magFilter: gl.LINEAR, wrapS: gl.CLAMP_TO_EDGE, wrapT: gl.CLAMP_TO_EDGE });
-      compositeUniforms.uDisplacement.value = displacementTarget.texture;
-      compositeUniforms.uTexel.value = [1 / DISP, 1 / DISP];
-
-      var compositeMesh = new ogl.Mesh(gl, {
-        geometry: new ogl.Triangle(gl),
-        program: new ogl.Program(gl, { vertex: screenVertex, fragment: compositeFragment, uniforms: compositeUniforms, depthTest: false, depthWrite: false })
-      });
-
-      var width = 1, height = 1;
-      function resize() {
-        width = Math.max(1, rippleEl.clientWidth);
-        height = Math.max(1, rippleEl.clientHeight);
-        renderer.setSize(width, height);
-        compositeUniforms.uResolution.value = [width, height];
-      }
-      var ro = new ResizeObserver(resize);
-      ro.observe(rippleEl);
-      resize();
-
-      function setWave(x, y, power) {
-        var w = waves[current];
-        current = (current + 1) % MAX_WAVES;
-        w.x = x; w.y = y;
-        w.scale = START_SCALE * power;
-        w.target = START_SCALE * Math.max(1, 5) * power;
-        w.size = Math.max(1, 150);
-        w.opacity = 1;
-      }
-      function localPoint(cx, cy) {
-        var r = rippleEl.getBoundingClientRect();
-        if (r.width === 0 || r.height === 0) return null;
-        if (cx < r.left || cx > r.right || cy < r.top || cy > r.bottom) return null;
-        return [cx - r.left, r.height - (cy - r.top)];
-      }
-
-      var px = 0, py = 0;
-      function onMove(e) {
-        if (reduceMotion) return;
-        var p = localPoint(e.clientX, e.clientY);
-        if (!p) return;
-        var step = Math.max(1, 15);
-        if (Math.abs(p[0] - px) > step || Math.abs(p[1] - py) > step) {
-          setWave(p[0], p[1], 1);
-          px = p[0]; py = p[1];
-        }
-      }
-      window.addEventListener('pointermove', onMove, { passive: true });
-
-      var raf = 0, prevTime = 0;
-      function loop(now) {
-        raf = requestAnimationFrame(loop);
-        var delta = prevTime ? Math.min(0.05, (now - prevTime) / 1000) : 0;
-        prevTime = now;
-        var growth = reduceMotion ? 0 : 1 - Math.exp(-delta * 1.09);
-        var decay = reduceMotion ? 1 : Math.exp((-delta * LIFE_CONSTANT) / Math.max(0.15, 3));
-        for (var i = 0; i < MAX_WAVES; i++) {
-          var w = waves[i];
-          if (w.opacity <= 0) { opacities[i] = 0; continue; }
-          w.opacity *= decay;
-          w.scale += (w.target - w.scale) * growth;
-          if (w.opacity < 0.002) { w.opacity = 0; opacities[i] = 0; continue; }
-          var half = (w.scale * w.size) / 2;
-          offsets[i * 2] = (w.x / width) * 2 - 1;
-          offsets[i * 2 + 1] = (w.y / height) * 2 - 1;
-          scales[i * 2] = (half / width) * 2;
-          scales[i * 2 + 1] = (half / height) * 2;
-          opacities[i] = w.opacity;
-        }
-        geometry.attributes.iOffset.needsUpdate = true;
-        geometry.attributes.iScale.needsUpdate = true;
-        geometry.attributes.iOpacity.needsUpdate = true;
-        renderer.render({ scene: waveMesh, target: displacementTarget, clear: true });
-        renderer.render({ scene: compositeMesh });
-      }
-      raf = requestAnimationFrame(loop);
-    } catch (err) {
-      rippleEl.style.display = 'none';
-      window.__rippleErr = err && err.message ? err.message : String(err);
-    }
-  }
-
-  /* ============ 3. 滚动揭示（多方向 + 延迟 + 安全兜底） ============ */
-  var reveals = d.querySelectorAll('[data-reveal]');
-  var revealedCount = 0;
-  function markVisible(el) {
-    if (el.classList.contains('revealed')) return;
-    el.classList.add('revealed');
-    if (el.dataset.delay) el.style.transitionDelay = el.dataset.delay + 'ms';
-    revealedCount++;
-  }
-  if ('IntersectionObserver' in window) {
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        if (en.isIntersecting) { markVisible(en.target); io.unobserve(en.target); }
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
-    reveals.forEach(function (el) { io.observe(el); });
-  } else {
-    reveals.forEach(markVisible);
-  }
-  // 安全兜底：无论怎样，3 秒后全部可见
-  setTimeout(function () {
-    reveals.forEach(markVisible);
-  }, 3000);
-
-  /* ============ 4. 数字滚动 ============ */
-  var counters = d.querySelectorAll('[data-count]');
-  function runCounter(el) {
-    var target = parseInt(el.dataset.count, 10);
-    var pad = el.dataset.pad !== undefined;
-    var start = null, dur = 1400;
-    function step(ts) {
-      if (!start) start = ts;
-      var pr = Math.min((ts - start) / dur, 1);
-      var eased = 1 - Math.pow(1 - pr, 3);
-      var val = Math.round(target * eased);
-      el.textContent = pad ? (val < 10 ? '0' + val : val) : String(val);
-      if (pr < 1) requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
-  }
-  if ('IntersectionObserver' in window) {
-    var cio = new IntersectionObserver(function (es) {
-      es.forEach(function (en) {
-        if (en.isIntersecting) { runCounter(en.target); cio.unobserve(en.target); }
-      });
-    }, { threshold: .5 });
-    counters.forEach(function (el) { cio.observe(el); });
-  } else {
-    counters.forEach(runCounter);
-  }
-
-  /* ============ 5. 磁吸按钮 ============ */
-  var magnets = d.querySelectorAll('[data-magnetic]');
-  magnets.forEach(function (btn) {
-    btn.addEventListener('mousemove', function (e) {
-      var r = btn.getBoundingClientRect();
-      var x = e.clientX - r.left - r.width / 2;
-      var y = e.clientY - r.top - r.height / 2;
-      btn.style.transform = 'translate(' + x * .18 + 'px,' + y * .22 + 'px)';
-    });
-    btn.addEventListener('mouseleave', function () {
-      btn.style.transform = '';
-    });
-  });
-
-  /* ============ 6. 滚动进度条 + 导航状态 ============ */
-  var progress = d.getElementById('progress');
-  var header = d.getElementById('header');
-  var navLinks = d.querySelectorAll('.nav-links a');
-  var sections = d.querySelectorAll('section[id]');
-  function onScroll() {
-    var st = window.scrollY;
-    var h = d.documentElement.scrollHeight - window.innerHeight;
-    progress.style.width = (h > 0 ? (st / h) * 100 : 0) + '%';
-    header.classList.toggle('scrolled', st > 40);
-    // 高亮当前 section
-    var cur = 'about';
-    sections.forEach(function (s) {
-      if (st >= s.offsetTop - 200) cur = s.id;
-    });
-    navLinks.forEach(function (a) {
-      a.classList.toggle('active', a.getAttribute('href') === '#' + cur);
-    });
-  }
-  window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
-
-  /* ============ 7. 光标光晕 ============ */
-  var glow = d.getElementById('cursorGlow');
-  var glowOn = false;
-  window.addEventListener('mousemove', function (e) {
-    glow.style.left = e.clientX + 'px';
-    glow.style.top = e.clientY + 'px';
-    if (!glowOn) { glowOn = true; glow.classList.add('on'); }
-  });
-  document.addEventListener('mouseleave', function () { glow.classList.remove('on'); glowOn = false; });
-})();
-</script>
 
 </body>
 </html>
