@@ -90,6 +90,9 @@
   .sec-head .all { font-size: 13px; color: var(--ink-mute); }
   .sec-head .all:hover { color: var(--accent); }
 
+  .about-text .lead { font-size: 16px; color: var(--ink); font-weight: 600; margin-bottom: 14px; }
+  .about-text p { font-size: 14px; color: var(--ink-soft); margin-bottom: 12px; }
+
   /* 项目列表 */
   .project-item { padding: 22px 0; border-top: 1px solid var(--rule); }
   .project-item:last-child { border-bottom: 1px solid var(--rule); }
@@ -159,7 +162,6 @@
     <nav class="nav-links">
       <a href="#about">背景</a>
       <a href="#projects">项目</a>
-      <a href="#teardown">拆解</a>
       <a href="#blog">博客</a>
     </nav>
     <a class="nav-gh" href="https://github.com/fengxinbo558" target="_blank" rel="noopener">GitHub ↗</a>
@@ -183,9 +185,9 @@
         <div><h3>项目</h3><p>个人项目 · 声音导演</p></div>
         <span class="arrow">→</span>
       </a>
-      <a class="card" href="#teardown">
-        <span class="num">10+</span>
-        <div><h3>拆解</h3><p>深度产品拆解</p></div>
+      <a class="card" href="#skills">
+        <span class="num">06</span>
+        <div><h3>能力</h3><p>从拆解到沉淀</p></div>
         <span class="arrow">→</span>
       </a>
       <a class="card" href="#blog">
@@ -202,6 +204,19 @@
     <!-- ---------- 主栏 ---------- -->
     <div class="main">
 
+      <!-- 个人背景 -->
+      <section id="about">
+        <div class="sec-head">
+          <h2>个人背景</h2>
+        </div>
+        <div class="about-text">
+          <p class="lead">我是一名 AI 产品经理，专注 AI 产品拆解与用户旅程分析。</p>
+          <p>日常与 AI Agent、提示词工程、自动化工作流打交道，关注大模型能力如何真正落地为产品价值。</p>
+          <p>特别着迷于「产品拆解」：打开产品、逐条浏览真实操作记录，梳理从输入需求到最终产出的完整用户旅程，再判断哪些体验是好的、哪些是断裂的。</p>
+          <p>方法上坚持「证据优先」——页面事实、合理推断、尚未确认，拒绝脑补式结论，并把拆解能力沉淀为可复用的 Skill 与 Agent 工作流。</p>
+        </div>
+      </section>
+
       <!-- 项目 -->
       <section id="projects">
         <div class="sec-head">
@@ -214,42 +229,6 @@
           <h3><a href="https://github.com/fengxinbo558/rensheng" target="_blank" rel="noopener">声音导演<span class="repo">rensheng</span> ↗</a></h3>
           <div class="tags"><span class="tag">macOS</span><span class="tag">离线 TTS</span><span class="tag">音色克隆</span><span class="tag">有声出版</span></div>
           <p>本地离线为主的 macOS 私人声音出版台：加入文字、PDF 或网页，选好音色即可生成朗读音频，导出 WAV / M4A / MP3，支持自定义个人音色。</p>
-        </div>
-      </section>
-
-      <!-- 拆解 -->
-      <section id="teardown">
-        <div class="sec-head">
-          <h2>拆解</h2>
-          <span class="all">精选产品拆解案例</span>
-        </div>
-
-        <div class="project-item">
-          <div class="meta">CASE STUDY — 视频生成</div>
-          <h3><a href="#">OiiOii · AI 视频生成产品拆解</a></h3>
-          <div class="tags"><span class="tag">用户旅程图</span><span class="tag">视频生成</span></div>
-          <p>从输入需求到产出视频的完整旅程，覆盖角色 / 场景 / 道具 / 分镜与纠偏路径。</p>
-        </div>
-
-        <div class="project-item">
-          <div class="meta">CASE STUDY — 四阶段框架</div>
-          <h3><a href="#">Mindtrip.ai · 四阶段产品拆解</a></h3>
-          <div class="tags"><span class="tag">四阶段框架</span><span class="tag">提示词</span></div>
-          <p>四阶段深度拆解提示词体系，系统化梳理产品从触达到转化的完整逻辑。</p>
-        </div>
-
-        <div class="project-item">
-          <div class="meta">CASE STUDY — 旅行规划</div>
-          <h3><a href="#">Wanderlog · 旅行规划产品拆解</a></h3>
-          <div class="tags"><span class="tag">用户旅程图</span><span class="tag">旅行规划</span></div>
-          <p>拆解旅行规划产品的用户旅程，产出结构化分析报告与可视化旅程图。</p>
-        </div>
-
-        <div class="project-item">
-          <div class="meta">CASE STUDY — Skill 定制</div>
-          <h3><a href="#">个性化写作 Skill</a></h3>
-          <div class="tags"><span class="tag">Skill 定制</span><span class="tag">个人风格</span></div>
-          <p>基于开源 Skill 迭代出适配个人风格的 AI 产品经理专业写作技能。</p>
         </div>
       </section>
 
@@ -286,21 +265,8 @@
     <!-- ---------- 侧栏 ---------- -->
     <aside class="sidebar">
 
-      <!-- 个人背景 -->
-      <section id="about">
-        <h2>关于我</h2>
-        <div class="about-me">
-          <div class="avatar">冯</div>
-          <div>
-            <p class="name">冯新波</p>
-            <p>AI产品经理，<a href="https://github.com/fengxinbo558" target="_blank" rel="noopener">GitHub</a></p>
-            <p>专注 AI 产品拆解与用户旅程分析，坚持「证据优先」——页面事实、合理推断、尚未确认，拒绝脑补式结论。</p>
-          </div>
-        </div>
-      </section>
-
       <!-- 能力 · 从拆解到沉淀 -->
-      <section>
+      <section id="skills">
         <h2>能力 · 从拆解到沉淀</h2>
         <ul class="skill-list">
           <li><b>AI 产品拆解</b> — 逐条取证，还原产品逻辑</li>
