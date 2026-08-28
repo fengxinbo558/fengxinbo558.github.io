@@ -46,7 +46,7 @@
       statement: '把 AI 能力，\n变成人们每天用得上的产品。', skills: 'AI 产品拆解 · Agent 工作流 · 需求洞察',
       formula: ['技术理解', '用户洞察', '商业判断'], profileLabel: 'PROFILE', workActionLabel: '查看产品案例', notesActionLabel: '阅读最新文章'
     },
-    assets: { avatar: 'avatar.svg', avatarAlt: '冯新波个人头像', avatarCaption: 'FENG XINBO / AI PM' },
+    assets: { avatar: 'assets/profile-avatar.jpg', avatarAlt: '冯新波个人头像', avatarCaption: 'FENG XINBO / AI PM' },
     decisionSystem: {
       heading: 'PRODUCT DECISION SYSTEM', centerTitle: '产品定义', centerLabel: 'DECISION CORE',
       lanes: [

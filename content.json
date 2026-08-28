@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "revision": "2026-08-29T00:00:00+08:00",
+  "revision": "2026-08-29T02:44:09+08:00",
   "profile": {
     "handle": "fengxinbo",
     "name": "冯新波",
@@ -15,7 +15,7 @@
     "notesActionLabel": "阅读最新文章"
   },
   "assets": {
-    "avatar": "avatar.svg",
+    "avatar": "assets/profile-avatar.jpg",
     "avatarAlt": "冯新波个人头像",
     "avatarCaption": "FENG XINBO / AI PM"
   },
