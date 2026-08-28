@@ -1,274 +1,241 @@
-// ============ NAXE 博客 — 交互与动效 ============
-(function () {
+document.documentElement.classList.add('js');
+
+(() => {
   'use strict';
 
-  // ---------- 加载页 ----------
-  const loader = document.getElementById('loader');
-  window.addEventListener('load', () => {
-    setTimeout(() => loader && loader.classList.add('done'), 350);
-  });
-  // 兜底：万一 load 已过
-  setTimeout(() => loader && loader.classList.add('done'), 2500);
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const workspace = document.getElementById('workspace');
+  const terminal = document.getElementById('terminal');
+  const bootLog = document.getElementById('boot-log');
+  const bootCta = document.getElementById('boot-cta');
+  const enterButton = document.getElementById('enter-workspace');
+  const skipButton = document.getElementById('skip-boot');
+  const terminalBody = document.getElementById('terminal-body');
+  const year = document.getElementById('year');
 
-  // ---------- 逐字母拆分（标题显现） ----------
-  const splitText = (el) => {
-    const walk = (node) => {
-      [...node.childNodes].forEach((child) => {
-        if (child.nodeType === 3) {
-          const frag = document.createDocumentFragment();
-          child.textContent.split(/(\s+)/).forEach((word) => {
-            if (!word) return;
-            if (/^\s+$/.test(word)) {
-              const s = document.createElement('span');
-              s.className = 'space';
-              s.textContent = ' ';
-              frag.appendChild(s);
-            } else {
-              const w = document.createElement('span');
-              w.className = 'word';
-              [...word].forEach((ch) => {
-                const l = document.createElement('span');
-                l.className = 'letter';
-                l.textContent = ch;
-                w.appendChild(l);
-              });
-              frag.appendChild(w);
-            }
-          });
-          node.replaceChild(frag, child);
-        } else if (child.nodeType === 1 && child.tagName !== 'BR') {
-          walk(child);
-        }
-      });
-    };
-    walk(el);
-    // 交错延迟
-    [...el.querySelectorAll('.letter')].forEach((l, i) => {
-      l.style.transitionDelay = (i * 24) + 'ms';
+  if (year) year.textContent = new Date().getFullYear();
+  requestAnimationFrame(() => workspace?.classList.add('is-primed'));
+
+  const bootLines = [
+    [['term-prompt', 'fengxinbo@portfolio:~$ '], ['term-command', 'init fengxinbo.portfolio']],
+    [['term-dim', '[01/04] '], ['term-output', '初始化个人工作区'], ['term-ok', '  OK']],
+    [['term-dim', '[02/04] '], ['term-output', '加载产品内核 decision-core.ai'], ['term-ok', '  OK']],
+    [['term-dim', '[03/04] '], ['term-output', '挂载 /insight 与 /agent-workflow'], ['term-ok', '  OK']],
+    [['term-dim', '[04/04] '], ['term-output', '启动产品工作台 portfolio.app'], ['term-ok', '  OK']],
+    [],
+    [['term-name', '冯新波 · AI Product Manager']],
+    [['term-output', '把 AI 能力，变成人们每天用得上的产品']],
+    [['term-prompt', 'echo '], ['term-command', '"AI 产品拆解 × Agent 工作流 × 需求洞察"']],
+    [['term-gold', 'AI 产品拆解 × Agent 工作流 × 需求洞察']],
+    [],
+    [['term-ready', 'SYSTEM READY']]
+  ];
+
+  let bootFinished = false;
+  let workspaceEntered = false;
+  const bootTimers = [];
+
+  const appendBootLine = (parts) => {
+    const line = document.createElement('p');
+    line.className = 'term-line';
+    if (parts.length === 0) line.innerHTML = '&nbsp;';
+    parts.forEach(([className, text]) => {
+      const span = document.createElement('span');
+      span.className = className;
+      span.textContent = text;
+      line.appendChild(span);
+    });
+    bootLog?.appendChild(line);
+    if (terminalBody) terminalBody.scrollTop = terminalBody.scrollHeight;
+  };
+
+  const finishBoot = () => {
+    if (bootFinished) return;
+    bootFinished = true;
+    bootTimers.forEach(window.clearTimeout);
+    bootCta?.classList.add('is-ready');
+    skipButton?.setAttribute('hidden', '');
+  };
+
+  const renderBootImmediately = () => {
+    if (bootLog && bootLog.children.length < bootLines.length) {
+      bootLog.textContent = '';
+      bootLines.forEach(appendBootLine);
+    }
+    finishBoot();
+  };
+
+  const startBoot = () => {
+    if (reducedMotion.matches) {
+      renderBootImmediately();
+      return;
+    }
+    bootLines.forEach((line, index) => {
+      const timer = window.setTimeout(() => {
+        appendBootLine(line);
+        if (index === bootLines.length - 1) finishBoot();
+      }, 170 + index * 145);
+      bootTimers.push(timer);
     });
   };
-  document.querySelectorAll('.split-text').forEach(splitText);
 
-  // ---------- 字母上翻 hover（blink-text） ----------
-  const blinkText = (el) => {
-    const text = el.textContent;
-    el.textContent = '';
-    [...text].forEach((ch) => {
-      const c = document.createElement('span');
-      c.className = 'bchar';
-      const safe = ch === ' ' ? '\u00A0' : ch;
-      c.innerHTML = '<span class="out">' + safe + '</span><span class="in">' + safe + '</span>';
-      el.appendChild(c);
-    });
+  const enterWorkspace = () => {
+    if (workspaceEntered) return;
+    workspaceEntered = true;
+    if (!bootFinished) renderBootImmediately();
+    workspace?.classList.add('is-live');
+    terminal?.classList.add('is-leaving');
+    window.setTimeout(() => {
+      terminal?.classList.add('is-gone');
+      document.querySelector('.os-sidebar button.is-active')?.focus({ preventScroll: true });
+    }, reducedMotion.matches ? 0 : 680);
   };
-  document.querySelectorAll('.blink-text').forEach(blinkText);
 
-  // ---------- 滚动显现 ----------
-  const revealEls = document.querySelectorAll('.reveal');
-  const revealObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const el = entry.target;
-          // 交错：同类兄弟元素逐个延迟
-          const siblings = [...el.parentElement.children].filter((c) => c.classList.contains('reveal'));
-          const idx = siblings.indexOf(el);
-          el.style.transitionDelay = (idx % 4) * 90 + 'ms';
-          el.classList.add('is-visible');
-          revealObserver.unobserve(el);
-        }
-      });
-    },
-    { threshold: 0.12 }
-  );
-  revealEls.forEach((el) => revealObserver.observe(el));
-
-  // ---------- 标题显现 ----------
-  const splitObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          splitObserver.unobserve(entry.target);
-        }
-      });
-    },
-    { threshold: 0.3 }
-  );
-  document.querySelectorAll('.split-text').forEach((el) => splitObserver.observe(el));
-
-  // ---------- 数字递增 ----------
-  const animateCounter = (el) => {
-    const target = parseInt(el.dataset.target, 10) || 0;
-    const dur = 1400;
-    const start = performance.now();
-    const step = (now) => {
-      const p = Math.min((now - start) / dur, 1);
-      const eased = 1 - Math.pow(1 - p, 3);
-      el.textContent = Math.round(target * eased);
-      if (p < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  };
-  const counterObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          animateCounter(entry.target);
-          counterObserver.unobserve(entry.target);
-        }
-      });
-    },
-    { threshold: 0.6 }
-  );
-  document.querySelectorAll('.counter').forEach((el) => counterObserver.observe(el));
-
-  // ---------- 技能进度条 ----------
-  const skillObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const bar = entry.target.querySelector('.skill-bar > div');
-          if (bar) bar.style.width = bar.dataset.width;
-          skillObserver.unobserve(entry.target);
-        }
-      });
-    },
-    { threshold: 0.4 }
-  );
-  document.querySelectorAll('.skill').forEach((el) => skillObserver.observe(el));
-
-  // ---------- 跑马灯（复制一份实现无缝循环） ----------
-  const track = document.querySelector('.marquee-track');
-  if (track) {
-    track.innerHTML += track.innerHTML;
-  }
-
-  // ---------- 顶栏 + 全屏菜单 ----------
-  const header = document.getElementById('header');
-  const menu = document.getElementById('menu');
-  const hamburger = document.getElementById('hamburger');
-
-  const setMenu = (open) => {
-    menu.classList.toggle('open', open);
-    hamburger.classList.toggle('active', open);
-    hamburger.setAttribute('aria-expanded', String(open));
-    document.body.style.overflow = open ? 'hidden' : '';
-  };
-  hamburger.addEventListener('click', () => setMenu(!menu.classList.contains('open')));
-  menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setMenu(false)));
-
-  // ---------- 专栏切换 ----------
-  const seriesItems = document.querySelectorAll('.series-item');
-  const seriesPanels = document.querySelectorAll('.series-panel');
-  seriesItems.forEach((item) => {
-    item.addEventListener('click', () => {
-      seriesItems.forEach((i) => i.classList.remove('is-active'));
-      seriesPanels.forEach((p) => p.classList.remove('is-active'));
-      item.classList.add('is-active');
-      const idx = item.dataset.index;
-      seriesPanels.forEach((p) => {
-        if (p.dataset.index === idx) p.classList.add('is-active');
-      });
-    });
-    item.addEventListener('mouseenter', () => {
-      if (window.innerWidth <= 960) return;
-      item.click();
-    });
-  });
-
-  // ---------- FAQ 手风琴 ----------
-  document.querySelectorAll('.faq-item').forEach((item) => {
-    const q = item.querySelector('.faq-q');
-    const a = item.querySelector('.faq-a');
-    q.addEventListener('click', () => {
-      const open = item.classList.contains('open');
-      document.querySelectorAll('.faq-item.open').forEach((o) => {
-        o.classList.remove('open');
-        o.querySelector('.faq-a').style.maxHeight = '0px';
-        o.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
-      });
-      if (!open) {
-        item.classList.add('open');
-        a.style.maxHeight = a.scrollHeight + 'px';
-        q.setAttribute('aria-expanded', 'true');
-      }
-    });
-  });
-
-  // ---------- 读者说轮播 ----------
-  const quoteTrack = document.getElementById('quoteTrack');
-  const slides = quoteTrack ? quoteTrack.querySelectorAll('.quote-slide') : [];
-  let qi = 0;
-  const goQuote = (n) => {
-    qi = (n + slides.length) % slides.length;
-    quoteTrack.style.transform = 'translateX(-' + qi * 100 + '%)';
-  };
-  document.getElementById('quotePrev') && document.getElementById('quotePrev').addEventListener('click', () => goQuote(qi - 1));
-  document.getElementById('quoteNext') && document.getElementById('quoteNext').addEventListener('click', () => goQuote(qi + 1));
-
-  // ---------- 回到顶部 ----------
-  document.getElementById('scrollTop').addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
-
-  // ---------- 视差 + 顶栏状态（rAF 合帧） ----------
-  const rellaxEls = document.querySelectorAll('.rellax');
-  let ticking = false;
-  const update = () => {
-    const y = window.scrollY;
-    if (y > 20) header.classList.add('scrolled');
-    else header.classList.remove('scrolled');
-    rellaxEls.forEach((el, i) => {
-      el.style.transform = 'translateY(' + y * (0.08 + i * 0.02) + 'px)';
-    });
-    ticking = false;
-  };
-  window.addEventListener('scroll', () => {
-    if (!ticking) {
-      requestAnimationFrame(update);
-      ticking = true;
+  startBoot();
+  skipButton?.addEventListener('click', renderBootImmediately);
+  enterButton?.addEventListener('click', enterWorkspace);
+  document.addEventListener('keydown', (event) => {
+    if (!workspaceEntered && bootFinished && (event.key === 'Enter' || event.key === ' ')) {
+      event.preventDefault();
+      enterWorkspace();
     }
   });
-  update();
 
-  // ---------- 年份 ----------
-  document.getElementById('year').textContent = new Date().getFullYear();
+  const navButtons = [...document.querySelectorAll('[data-view]')];
+  const viewPanels = [...document.querySelectorAll('[data-view-panel]')];
+  const windowPath = document.getElementById('window-path');
+  const osContext = document.getElementById('os-context');
+  const footerCommand = document.getElementById('footer-command');
+  const viewLabels = {
+    about: 'AI PRODUCT MANAGER / ABOUT',
+    work: 'SELECTED PRODUCT WORK / WORK',
+    notes: 'PUBLIC WRITING / NOTES',
+    contact: 'OPEN CHANNEL / CONTACT'
+  };
 
-  // ---------- 复制微信号 + Toast ----------
-  const copyText = (text) => {
-    const fallback = () => {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed';
-      ta.style.opacity = '0';
-      document.body.appendChild(ta);
-      ta.select();
-      try { document.execCommand('copy'); } catch (e) {}
-      document.body.removeChild(ta);
-    };
-    if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(text).catch(fallback);
-    } else {
-      fallback();
-    }
-  };
-  const showToast = (msg) => {
-    let toast = document.getElementById('toast');
-    if (!toast) {
-      toast = document.createElement('div');
-      toast.id = 'toast';
-      document.body.appendChild(toast);
-    }
-    toast.textContent = msg;
-    toast.classList.add('show');
-    clearTimeout(toast._t);
-    toast._t = setTimeout(() => toast.classList.remove('show'), 1500);
-  };
-  document.querySelectorAll('[data-copy]').forEach((el) => {
-    el.addEventListener('click', () => {
-      copyText(el.dataset.copy);
-      showToast('已复制');
+  const showView = (view, { moveFocus = false } = {}) => {
+    if (!viewLabels[view]) return;
+    navButtons.forEach((button) => {
+      const active = button.dataset.view === view;
+      button.classList.toggle('is-active', active);
+      if (active) button.setAttribute('aria-current', 'page');
+      else button.removeAttribute('aria-current');
     });
+    viewPanels.forEach((panel) => {
+      const active = panel.dataset.viewPanel === view;
+      panel.classList.toggle('is-active', active);
+      panel.setAttribute('aria-hidden', String(!active));
+    });
+    if (windowPath) windowPath.textContent = `~/portfolio/${view}`;
+    if (osContext) osContext.textContent = viewLabels[view];
+    if (footerCommand) footerCommand.textContent = `open ${view}`;
+    if (moveFocus) navButtons.find((button) => button.dataset.view === view)?.focus({ preventScroll: true });
+    if (window.innerWidth <= 900) document.querySelector('.main-window')?.scrollIntoView({ behavior: reducedMotion.matches ? 'auto' : 'smooth', block: 'start' });
+  };
+
+  navButtons.forEach((button, index) => {
+    button.addEventListener('click', () => showView(button.dataset.view));
+    button.addEventListener('keydown', (event) => {
+      if (!['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+      event.preventDefault();
+      const direction = ['ArrowDown', 'ArrowRight'].includes(event.key) ? 1 : -1;
+      const target = navButtons[(index + direction + navButtons.length) % navButtons.length];
+      showView(target.dataset.view, { moveFocus: true });
+    });
+  });
+  document.querySelectorAll('[data-open-view]').forEach((button) => button.addEventListener('click', () => showView(button.dataset.openView, { moveFocus: false })));
+
+  const laneDescriptions = {
+    scene: '从真实场景出发，找到值得解决的问题，再定义用户能理解、能控制的体验。',
+    agent: '先判断模型能力与边界，再把任务拆进可观察、可恢复的 Agent 工作流。',
+    value: '连接用户价值、实现成本与业务节奏，用可验证结果推动产品持续迭代。'
+  };
+  const decisionLanes = [...document.querySelectorAll('[data-lane]')];
+  const decisionExplainer = document.getElementById('decision-explainer');
+
+  const selectLane = (lane) => {
+    decisionLanes.forEach((button) => {
+      const selected = button.dataset.lane === lane;
+      button.classList.toggle('is-selected', selected);
+      button.setAttribute('aria-pressed', String(selected));
+    });
+    const text = decisionExplainer?.querySelector('span');
+    if (text) text.textContent = laneDescriptions[lane];
+    decisionExplainer?.classList.remove('is-changing');
+    requestAnimationFrame(() => decisionExplainer?.classList.add('is-changing'));
+  };
+
+  decisionLanes.forEach((button) => {
+    button.addEventListener('click', () => selectLane(button.dataset.lane));
+    button.addEventListener('mouseenter', () => {
+      if (window.matchMedia('(min-width: 901px)').matches) selectLane(button.dataset.lane);
+    });
+  });
+
+  const projectTabs = [...document.querySelectorAll('[data-project]')];
+  const projectPanels = [...document.querySelectorAll('[data-project-panel]')];
+  const selectProject = (project, { moveFocus = false } = {}) => {
+    projectTabs.forEach((tab) => {
+      const selected = tab.dataset.project === project;
+      tab.classList.toggle('is-selected', selected);
+      tab.setAttribute('aria-selected', String(selected));
+      tab.tabIndex = selected ? 0 : -1;
+      if (selected && moveFocus) tab.focus();
+    });
+    projectPanels.forEach((panel) => {
+      const selected = panel.dataset.projectPanel === project;
+      panel.classList.toggle('is-selected', selected);
+      panel.hidden = !selected;
+    });
+  };
+
+  projectTabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => selectProject(tab.dataset.project));
+    tab.addEventListener('keydown', (event) => {
+      if (!['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+      event.preventDefault();
+      const direction = ['ArrowDown', 'ArrowRight'].includes(event.key) ? 1 : -1;
+      const target = projectTabs[(index + direction + projectTabs.length) % projectTabs.length];
+      selectProject(target.dataset.project, { moveFocus: true });
+    });
+  });
+
+  const portrait = document.getElementById('portrait-drag-layer');
+  const portraitCard = portrait?.querySelector('.portrait-card');
+  const portraitImage = portrait?.querySelector('img');
+  let drag = null;
+
+  const setPortraitTransform = (x, y, rotation) => {
+    portrait?.style.setProperty('--portrait-x', `${x}px`);
+    portrait?.style.setProperty('--portrait-y', `${y}px`);
+    portrait?.style.setProperty('--portrait-rotation', `${rotation}deg`);
+  };
+
+  portrait?.addEventListener('pointerdown', (event) => {
+    drag = { id: event.pointerId, startX: event.clientX, startY: event.clientY };
+    portrait.setPointerCapture(event.pointerId);
+    portrait.classList.add('is-dragging');
+  });
+  portrait?.addEventListener('pointermove', (event) => {
+    if (!drag || drag.id !== event.pointerId) return;
+    const maxX = Math.min(150, window.innerWidth * .22);
+    const x = Math.max(-maxX, Math.min(maxX, event.clientX - drag.startX));
+    const y = Math.max(-38, Math.min(150, event.clientY - drag.startY));
+    const rotation = Math.max(-7, Math.min(7, x / 20));
+    setPortraitTransform(x, y, rotation);
+  });
+  const releasePortrait = (event) => {
+    if (!drag || drag.id !== event.pointerId) return;
+    portrait.classList.remove('is-dragging');
+    if (portrait.hasPointerCapture(event.pointerId)) portrait.releasePointerCapture(event.pointerId);
+    drag = null;
+    setPortraitTransform(0, 0, 0);
+  };
+  portrait?.addEventListener('pointerup', releasePortrait);
+  portrait?.addEventListener('pointercancel', releasePortrait);
+
+  portraitImage?.addEventListener('error', () => {
+    portraitImage.hidden = true;
+    portraitCard?.classList.add('portrait-fallback');
   });
 })();
