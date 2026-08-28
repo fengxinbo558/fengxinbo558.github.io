@@ -204,7 +204,7 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .identity-panel h1 { max-width: 270px; font-size: clamp(46px, 4.45vw, 66px); font-weight: 700; line-height: 1.04; letter-spacing: -.05em; }
 .role-title { margin-top: 11px; color: var(--blue); font-family: var(--mono); font-size: clamp(18px, 1.7vw, 22px); letter-spacing: .02em; }
 .identity-rule { width: 28px; height: 3px; margin: 22px 0 24px; border-radius: 3px; background: var(--blue); }
-.hero-statement { font-size: clamp(20px, 1.75vw, 25px); font-weight: 500; line-height: 1.65; letter-spacing: -.02em; }
+.hero-statement { font-size: clamp(20px, 1.75vw, 25px); font-weight: 500; line-height: 1.65; letter-spacing: -.02em; white-space: pre-line; }
 .proof-line { display: flex; align-items: center; gap: 8px; margin-top: 18px; color: var(--muted); font-size: 12px; }
 .proof-line svg { flex: none; color: var(--green); }
 .handwritten-formula { display: flex; align-items: baseline; gap: clamp(7px, .8vw, 12px); margin-top: 19px; color: #2463b7; font-family: var(--hand); font-size: clamp(18px, 1.55vw, 25px); font-weight: 700; line-height: 1; letter-spacing: -.035em; transform: rotate(-1.4deg); }
@@ -222,7 +222,7 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .portrait-rope path { fill: none; stroke: #87939f; stroke-width: 1.35; filter: drop-shadow(0 1px 0 rgba(255, 255, 255, .7)); }
 .portrait-card { position: relative; overflow: hidden; width: 104px; height: 150px; padding: 5px 5px 25px; border: 1px solid #d6dde4; border-radius: 4px; background: #fff; box-shadow: 0 10px 24px rgba(42, 57, 72, .14); }
 .portrait-card img { width: 100%; height: 119px; object-fit: cover; filter: saturate(.88) contrast(.98); }
-.portrait-card.portrait-fallback::before { display: grid; width: 100%; height: 119px; place-items: center; background: var(--blue-soft); color: var(--ink); content: "冯"; font-size: 48px; font-weight: 700; }
+.portrait-card.portrait-fallback::before { display: grid; width: 100%; height: 119px; place-items: center; background: var(--blue-soft); color: var(--ink); content: var(--portrait-initial, "冯"); font-size: 48px; font-weight: 700; }
 .portrait-card figcaption { position: absolute; right: 8px; bottom: 7px; left: 8px; color: #6f7b87; font-family: var(--mono); font-size: 7px; letter-spacing: .05em; text-align: center; }
 .portrait-clip { position: absolute; z-index: 2; top: -8px; left: 50%; color: #697786; transform: translateX(-50%) rotate(8deg); }
 .site-shell.is-live .portrait-rig { animation: portrait-drop .9s cubic-bezier(.18, .82, .28, 1.08) .45s both; }
@@ -271,6 +271,8 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .work-list button svg { width: 17px; color: var(--faint); }
 .work-list button.is-selected { background: var(--blue-soft); color: var(--blue); }
 .work-list button.is-selected svg { color: var(--blue); }
+.project-arrow { color: var(--faint); font-size: 16px; }
+.work-list button.is-selected .project-arrow { color: var(--blue); }
 .work-details { min-width: 0; }
 .project-panel { display: flex; height: 100%; flex-direction: column; justify-content: center; padding: 34px; animation: view-swap .38s ease both; }
 .work-meta { color: var(--blue); font-family: var(--mono); font-size: 9px; letter-spacing: .12em; }
@@ -299,6 +301,16 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .cover-double i { z-index: 1; font-size: 10px; font-style: normal; }
 .cover-double > span { z-index: 1; width: 38px; border-top: 1px dashed var(--amber); }
 .cover-double b { z-index: 1; color: var(--amber); font-size: 30px; }
+.cover-blue { gap: 20px; background: linear-gradient(135deg, #dbe9ff, #f5f9ff); }
+.cover-green { gap: 20px; background: linear-gradient(135deg, #e6f6ee, #fbfdfc); }
+.cover-amber { gap: 20px; background: linear-gradient(135deg, #fff3d8, #fffaf0); }
+.cover-blue i, .cover-green i, .cover-amber i,
+.cover-blue b, .cover-green b, .cover-amber b { position: relative; z-index: 1; max-width: 46%; font-style: normal; white-space: pre-line; }
+.cover-blue i, .cover-green i, .cover-amber i { font-size: 9px; line-height: 1.45; }
+.cover-blue b, .cover-green b, .cover-amber b { font-size: 17px; line-height: 1.25; }
+.cover-blue b { color: var(--blue); }
+.cover-green b { color: var(--green); }
+.cover-amber b { color: var(--amber); }
 .note-card-body { display: flex; min-height: 116px; flex: 1; flex-direction: column; padding: 13px 15px 14px; }
 .note-card-body small { color: var(--faint); font-family: var(--mono); font-size: 7px; letter-spacing: .1em; }
 .note-card-body strong { margin-top: 7px; font-size: clamp(12px, .95vw, 14px); line-height: 1.48; }
@@ -314,6 +326,8 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .contact-channels a:hover { color: var(--blue); transform: translateX(3px); }
 .channel-icon { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 10px; background: var(--blue-soft); color: var(--blue); }
 .channel-icon svg { width: 21px; height: 21px; }
+.channel-icon-text { font-family: var(--mono); font-size: 10px; font-weight: 700; }
+.channel-arrow { color: var(--faint); font-size: 17px; }
 .contact-channels a > span:nth-child(2) { min-width: 0; }
 .contact-channels small { display: block; color: var(--faint); font-family: var(--mono); font-size: 8px; letter-spacing: .1em; }
 .contact-channels strong { display: block; overflow: hidden; margin-top: 4px; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
@@ -321,11 +335,16 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .response-note { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 28px; color: var(--muted); font-size: 12px; }
 .response-note span { color: var(--green); font-family: var(--mono); font-size: 8px; letter-spacing: .12em; }
 .response-note b { font-weight: 500; }
+.contact-empty, .content-empty { display: grid; min-height: 150px; place-items: center; padding: 24px; color: var(--muted); font-size: 13px; text-align: center; }
+.contact-empty { min-height: 100px; border-top: 1px solid var(--line); }
+.is-disabled { cursor: not-allowed !important; opacity: .55; pointer-events: none; }
 
 .terminal-strip { display: flex; min-width: 0; align-items: center; justify-content: space-between; padding: 0 26px; border: 1px solid var(--line-strong); border-radius: 10px; background: rgba(255, 255, 255, .62); color: #263544; font-family: var(--mono); font-size: 13px; }
 .terminal-strip b { color: var(--green); font-weight: 600; }
 .system-status { display: inline-flex; align-items: center; gap: 10px; color: var(--green); font-size: 10px; letter-spacing: .08em; }
 .system-status > i { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 5px rgba(51, 184, 121, .1); }
+.edit-content-link { display: inline-flex; align-items: center; gap: 6px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 7px; background: rgba(255, 255, 255, .7); color: var(--muted); font-size: 9px; letter-spacing: .04em; transition: border-color .2s ease, color .2s ease, background .2s ease; }
+.edit-content-link:hover { border-color: rgba(46, 117, 232, .28); background: var(--blue-soft); color: var(--blue); }
 
 @keyframes boot-line { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 @keyframes cursor-blink { 0%, 48% { opacity: 1; } 49%, 100% { opacity: 0; } }
@@ -422,6 +441,8 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
   .map-node small { font-size: 6px; }
   .decision-explainer { margin-top: -28px; margin-bottom: 22px; font-size: 10px; }
   .terminal-strip { padding-inline: 13px; font-size: 9px; }
+  .terminal-strip > p { display: none; }
+  .edit-content-link { padding-inline: 9px; }
   .system-status { font-size: 8px; }
   .terminal-body { padding: 16px 14px 90px; font-size: 12px; }
   .terminal-titlebar { grid-template-columns: 1fr auto; }

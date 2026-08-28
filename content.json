@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "revision": "2026-08-29T00:00:00+08:00",
+  "profile": {
+    "handle": "fengxinbo",
+    "name": "冯新波",
+    "englishName": "FENG XINBO",
+    "role": "AI 产品经理",
+    "roleEnglish": "AI Product Manager",
+    "statement": "把 AI 能力，\n变成人们每天用得上的产品。",
+    "skills": "AI 产品拆解 · Agent 工作流 · 需求洞察",
+    "formula": ["技术理解", "用户洞察", "商业判断"],
+    "profileLabel": "PROFILE / 2026",
+    "workActionLabel": "查看产品案例",
+    "notesActionLabel": "阅读最新文章"
+  },
+  "assets": {
+    "avatar": "avatar.svg",
+    "avatarAlt": "冯新波个人头像",
+    "avatarCaption": "FENG XINBO / AI PM"
+  },
+  "decisionSystem": {
+    "heading": "PRODUCT DECISION SYSTEM",
+    "centerTitle": "产品定义",
+    "centerLabel": "DECISION CORE",
+    "lanes": [
+      {
+        "id": "scene",
+        "tone": "blue",
+        "inputLabel": "INPUT 01",
+        "inputTitle": "用户场景",
+        "outputLabel": "OUTPUT 01",
+        "outputTitle": "可用体验",
+        "description": "从真实场景出发，找到值得解决的问题，再定义用户能理解、能控制的体验。"
+      },
+      {
+        "id": "agent",
+        "tone": "green",
+        "inputLabel": "INPUT 02",
+        "inputTitle": "模型能力",
+        "outputLabel": "OUTPUT 02",
+        "outputTitle": "Agent 工作流",
+        "description": "先判断模型能力与边界，再把任务拆进可观察、可恢复的 Agent 工作流。"
+      },
+      {
+        "id": "value",
+        "tone": "amber",
+        "inputLabel": "INPUT 03",
+        "inputTitle": "业务目标",
+        "outputLabel": "OUTPUT 03",
+        "outputTitle": "可验证价值",
+        "description": "连接用户价值、实现成本与业务节奏，用可验证结果推动产品持续迭代。"
+      }
+    ]
+  },
+  "workSection": {
+    "kicker": "SELECTED WORK",
+    "title": "AI 产品、工具与持续实践",
+    "description": "把判断变成可以运行、可以验证、可以继续迭代的产品与内容。",
+    "overviewLabel": "查看 GitHub 全部项目",
+    "overviewUrl": "https://github.com/fengxinbo558",
+    "projects": [
+      {
+        "id": "sound",
+        "title": "声音导演",
+        "meta": "AI PRODUCT / OPEN SOURCE",
+        "description": "围绕声音创作与 AI 协作探索的个人项目，把创作需求转化为可执行的产品流程。",
+        "buttonLabel": "查看项目",
+        "url": "https://github.com/fengxinbo558/rensheng",
+        "status": "可公开访问"
+      },
+      {
+        "id": "github",
+        "title": "GitHub 开源主页",
+        "meta": "BUILD IN PUBLIC",
+        "description": "持续公开个人项目、实验与工作流，让产品思考留下可以复用和验证的版本记录。",
+        "buttonLabel": "访问 GitHub",
+        "url": "https://github.com/fengxinbo558",
+        "status": "持续更新"
+      },
+      {
+        "id": "channel",
+        "title": "AI 超人强",
+        "meta": "WRITING / AI PRODUCT",
+        "description": "记录 AI 产品拆解、Agent 工作流与真实使用体验，把一次判断沉淀成可讨论的公开内容。",
+        "buttonLabel": "阅读公众号文章",
+        "url": "https://mp.weixin.qq.com/s/t1m4CRxeSTAquwfZ5ij9jw",
+        "status": "持续写作"
+      }
+    ]
+  },
+  "notesSection": {
+    "kicker": "PUBLIC NOTES",
+    "title": "关于 AI 产品的公开笔记",
+    "description": "从产品入口、知识管理到 AI 分身，记录判断形成的过程。",
+    "contactLabel": "交流一个具体问题",
+    "emptyMessage": "文章整理中，欢迎稍后再来。",
+    "articles": [
+      {
+        "id": "default-entry",
+        "title": "ChatGPT 不想只和你聊天了：它正在争夺工作的默认入口",
+        "category": "AI 产品",
+        "date": "2026.08",
+        "url": "https://mp.weixin.qq.com/s/vXqV_QBgE5vNep-U0-KMqw",
+        "coverPrimary": "DEFAULT ENTRY",
+        "coverSecondary": "CHAT → WORK",
+        "tone": "blue"
+      },
+      {
+        "id": "knowledge-base",
+        "title": "AI 知识库最大的错觉：资料可以问，不等于知识被管理了",
+        "category": "知识库",
+        "date": "2026.08",
+        "url": "https://mp.weixin.qq.com/s/Qb1ArAg-xoccDqcfecveEQ",
+        "coverPrimary": "FILES",
+        "coverSecondary": "≠ KNOWLEDGE",
+        "tone": "green"
+      },
+      {
+        "id": "second-me",
+        "title": "我养了一个越来越像我的 AI，最后却只敢让它做最简单的事",
+        "category": "案例拆解",
+        "date": "2026.08",
+        "url": "https://mp.weixin.qq.com/s/t1m4CRxeSTAquwfZ5ij9jw",
+        "coverPrimary": "ME → SECOND ME",
+        "coverSecondary": "?",
+        "tone": "amber"
+      }
+    ]
+  },
+  "contactSection": {
+    "kicker": "OPEN CHANNEL",
+    "title": "欢迎因为一个具体问题来找我",
+    "description": "如果你也在做 AI 产品、Agent 工作流或产品拆解，可以通过 GitHub 或公众号联系我。",
+    "primaryLabel": "在 GitHub 找我",
+    "primaryUrl": "https://github.com/fengxinbo558",
+    "statusLabel": "AVAILABLE FOR CONVERSATION",
+    "responseLabel": "STATUS",
+    "responseText": "优先回复具体、清楚的问题",
+    "emptyMessage": "新的联系方式正在整理中。",
+    "channels": [
+      {
+        "id": "github",
+        "type": "github",
+        "label": "GITHUB",
+        "value": "@fengxinbo558",
+        "url": "https://github.com/fengxinbo558"
+      },
+      {
+        "id": "wechat",
+        "type": "wechat",
+        "label": "WECHAT OFFICIAL ACCOUNT",
+        "value": "AI 超人强",
+        "url": "https://mp.weixin.qq.com/s/t1m4CRxeSTAquwfZ5ij9jw"
+      }
+    ]
+  }
+}

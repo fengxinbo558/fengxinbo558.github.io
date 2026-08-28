@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="冯新波个人主页可视化编辑后台" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#f4f7f9" />
+    <title>编辑个人主页 · 冯新波</title>
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#editor">跳到内容编辑区</a>
+
+    <header class="admin-header">
+      <a class="back-link" href="../">← 返回个人主页</a>
+      <div class="admin-title">
+        <span class="status-dot" aria-hidden="true"></span>
+        <div><strong>个人主页编辑器</strong><small>fengxinbo.portfolio / CONTENT ADMIN</small></div>
+      </div>
+      <div class="header-actions">
+        <span class="save-state" id="save-state">正在读取内容…</span>
+        <button class="quiet-button" id="clear-token" type="button" disabled>清除 Token</button>
+        <button class="publish-button" id="publish" type="button" disabled>发布更新</button>
+      </div>
+    </header>
+
+    <section class="connection-card" aria-labelledby="connection-title">
+      <div>
+        <p class="eyebrow">GITHUB CONNECTION</p>
+        <h1 id="connection-title">连接后，就能把修改同步到线上</h1>
+        <p>Token 只保存在当前页面，刷新或关闭后会自动清除。</p>
+      </div>
+      <div class="token-box">
+        <label for="github-token">GitHub Token</label>
+        <div class="token-row">
+          <input id="github-token" type="password" placeholder="github_pat_…" autocomplete="off" autocapitalize="off" spellcheck="false" />
+          <button id="connect" type="button">连接 GitHub</button>
+        </div>
+        <details>
+          <summary>第一次使用，Token 怎么设置？</summary>
+          <ol>
+            <li><a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">打开 GitHub 新建细粒度 Token</a>。</li>
+            <li>仓库只选择 <code>fengxinbo558.github.io</code>。</li>
+            <li>Repository permissions 里把 Contents 设为 Read and write。</li>
+          </ol>
+        </details>
+      </div>
+    </section>
+
+    <div class="notice" id="notice" role="status" aria-live="polite">你可以先编辑和预览；连接 GitHub 后才能发布。</div>
+
+    <main class="admin-shell">
+      <nav class="editor-nav" aria-label="编辑内容分类">
+        <button class="is-active" type="button" data-panel="profile"><span>01</span>基本资料</button>
+        <button type="button" data-panel="decision"><span>02</span>决策路径</button>
+        <button type="button" data-panel="projects"><span>03</span>项目</button>
+        <button type="button" data-panel="articles"><span>04</span>文章</button>
+        <button type="button" data-panel="contacts"><span>05</span>联系方式</button>
+        <button type="button" data-panel="avatar"><span>06</span>头像</button>
+      </nav>
+
+      <section class="editor-card" id="editor" aria-labelledby="editor-title">
+        <header class="editor-heading">
+          <div><p class="eyebrow" id="editor-kicker">BASIC PROFILE</p><h2 id="editor-title">基本资料</h2></div>
+          <span id="field-count"></span>
+        </header>
+        <div class="validation-summary" id="validation-summary" role="alert" hidden></div>
+        <form id="editor-form" novalidate>
+          <section class="form-panel is-active" data-form-panel="profile"></section>
+          <section class="form-panel" data-form-panel="decision" hidden></section>
+          <section class="form-panel" data-form-panel="projects" hidden></section>
+          <section class="form-panel" data-form-panel="articles" hidden></section>
+          <section class="form-panel" data-form-panel="contacts" hidden></section>
+          <section class="form-panel" data-form-panel="avatar" hidden></section>
+        </form>
+      </section>
+
+      <aside class="preview-card" aria-labelledby="preview-title">
+        <header class="preview-heading">
+          <div><p class="eyebrow">LIVE PREVIEW</p><h2 id="preview-title">实时预览</h2></div>
+          <div class="preview-switch" role="group" aria-label="预览尺寸">
+            <button class="is-active" type="button" data-preview-size="desktop">桌面</button>
+            <button type="button" data-preview-size="mobile">手机</button>
+          </div>
+        </header>
+        <div class="preview-viewport" id="preview-viewport">
+          <iframe id="site-preview" title="个人主页实时预览" src="../?preview=1"></iframe>
+        </div>
+      </aside>
+    </main>
+
+    <section class="publish-drawer" id="publish-drawer" aria-labelledby="publish-title" hidden>
+      <div>
+        <p class="eyebrow">PUBLISH UPDATE</p>
+        <h2 id="publish-title">确认发布这次修改</h2>
+        <p>发布后 GitHub Pages 通常需要一点时间同步。</p>
+      </div>
+      <label for="commit-message">本次更新说明（可选）</label>
+      <input id="commit-message" maxlength="120" placeholder="例如：更新项目与联系方式" />
+      <div class="drawer-actions">
+        <button class="quiet-button" id="cancel-publish" type="button">取消</button>
+        <button class="publish-button" id="confirm-publish" type="button">确认发布</button>
+      </div>
+    </section>
+    <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
+
+    <script src="../content-model.js"></script>
+    <script src="admin.js"></script>
+  </body>
+</html>
