@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "revision": "2026-08-29T02:44:09+08:00",
+  "revision": "2026-09-05T15:23:42.858Z",
   "profile": {
     "handle": "fengxinbo",
     "name": "冯新波",
@@ -9,7 +9,11 @@
     "roleEnglish": "AI Product Manager",
     "statement": "把 AI 能力，\n变成人们每天用得上的产品。",
     "skills": "AI 产品拆解 · Agent 工作流 · 需求洞察",
-    "formula": ["技术理解", "用户洞察", "商业判断"],
+    "formula": [
+      "技术理解",
+      "用户洞察",
+      "商业判断"
+    ],
     "profileLabel": "PROFILE / 2026",
     "workActionLabel": "查看产品案例",
     "notesActionLabel": "阅读最新文章"
@@ -60,6 +64,33 @@
     "overviewLabel": "查看 GitHub 全部项目",
     "overviewUrl": "https://github.com/fengxinbo558",
     "projects": [
+      {
+        "id": "project-mtn4acay",
+        "title": "AIDC智能运营决策平台",
+        "meta": "PROJECT",
+        "description": "面向AIDC运维、容量经营与能源优化的相关产品，帮助节省不必要的资源浪费。",
+        "buttonLabel": "查看项目",
+        "url": "https://github.com/fengxinbo558/aidc-gpu-ops-product",
+        "status": "持续更新"
+      },
+      {
+        "id": "project-mtn415a2",
+        "title": "机鉴平台",
+        "meta": "PROJECT",
+        "description": "一个本地化的IDC故障调查与现场良好的产品。机鉴通过获取真实日志、指标和同类，并连接模型执行带工具记录的人工智能调查。将原始输入、外部查询、字段来源、可核对事实、知识卡、竞争想象和下一步检查形成一条可审计调查链。",
+        "buttonLabel": "查看项目",
+        "url": "https://github.com/fengxinbo558/jijian",
+        "status": "持续更新"
+      },
+      {
+        "id": "project-mtnxxofj",
+        "title": "溯因",
+        "meta": "",
+        "description": "溯因针对单个开发者的本地阶段性代码审查：从工作区、暂存区、提交或指定文件获取快照，以后续为入口定位跨文件、跨约束逻辑冲突，并用证据和可验证因果冲突解释链问题。",
+        "buttonLabel": "查看项目",
+        "url": "https://github.com/fengxinbo558/suyin",
+        "status": "持续更新"
+      },
       {
         "id": "sound",
         "title": "声音导演",
